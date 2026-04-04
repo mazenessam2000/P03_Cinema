@@ -1,0 +1,140 @@
+﻿@model MovieCreateVM
+
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Update Movie</h2>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form asp-action="Update" method="post" enctype="multipart/form-data">
+
+                <input type="hidden" asp-for="Movie.Id" />
+
+                <!-- 🔴 SHOW ERRORS -->
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                <!-- Name -->
+                <div class="mb-3">
+                    <label asp-for="Movie.Name" class="form-label"></label>
+                    <input asp-for="Movie.Name" class="form-control" />
+                </div>
+
+                <!-- Description -->
+                <div class="mb-3">
+                    <label asp-for="Movie.Description" class="form-label"></label>
+                    <textarea asp-for="Movie.Description" class="form-control"></textarea>
+                </div>
+
+                <!-- Price -->
+                <div class="mb-3">
+                    <label asp-for="Movie.Price" class="form-label"></label>
+                    <input asp-for="Movie.Price" class="form-control" />
+                </div>
+
+                <!-- Release Date -->
+                <div class="mb-3">
+                    <label asp-for="Movie.ReleaseDate" class="form-label"></label>
+                    <input asp-for="Movie.ReleaseDate" type="date" class="form-control" />
+                </div>
+
+                <!-- Status -->
+                <div class="mb-3">
+                    <label asp-for="Movie.Status" class="form-label"></label>
+                    <input asp-for="Movie.Status" class="form-control" />
+                </div>
+
+                <!-- Main Image -->
+                <div class="mb-3">
+                    <label class="form-label">Main Image</label>
+                    <input asp-for="MainImg" type="file" class="form-control" />
+
+                    @if (!string.IsNullOrEmpty(Model.Movie.MainImage))
+                    {
+                        <div class="mt-2">
+                            <img src="~/Assets/Admin/img/movie/@Model.Movie.MainImage"
+                                 style="height:100px; object-fit:cover; border-radius:6px;" />
+                        </div>
+                    }
+                </div>
+
+                <!-- Gallery Upload -->
+                <div class="mb-3">
+                    <label class="form-label">Gallery</label>
+                    <input asp-for="Gallery" type="file" multiple class="form-control" />
+                </div>
+
+                <!-- Existing Gallery -->
+                @if (Model.Movie.Images != null && Model.Movie.Images.Any())
+                {
+                    <div class="mt-2 d-flex flex-wrap gap-2">
+                        @foreach (var img in Model.Movie.Images)
+                        {
+                            <div style="position:relative;">
+                                <img src="~/Assets/Admin/img/movie/@img.ImageUrl"
+                                     style="height:80px; width:80px; object-fit:cover; border-radius:6px;" />
+
+                                <button type="button"
+                                        onclick="deleteImage(@img.Id)"
+                                        class="btn btn-sm btn-danger"
+                                        style="position:absolute; top:0; right:0;">
+                                    ×
+                                </button>
+                            </div>
+                        }
+                    </div>
+                }
+
+                <!-- Actors -->
+                <div class="mb-3">
+                    <label class="form-label">Actors</label>
+                    <select asp-for="SelectedActors"
+                            asp-items="@(new MultiSelectList(Model.AllActors, "Id", "FullName", Model.SelectedActors))"
+                            class="form-select select2"
+                            multiple>
+                    </select>
+                </div>
+
+                <!-- Categories -->
+                <div class="mb-3">
+                    <label class="form-label">Categories</label>
+                    <select asp-for="SelectedCategories"
+                            asp-items="@(new MultiSelectList(Model.AllCategories, "Id", "Name", Model.SelectedCategories))"
+                            class="form-select select2"
+                            multiple>
+                    </select>
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Index" class="btn btn-outline-dark">← Back</a>
+                    <div>
+                        <button type="reset" class="btn btn-outline-secondary me-2">Reset</button>
+                        <button type="submit" class="btn btn-primary">Update Movie</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $('.select2').select2({
+            width: '100%'
+        });
+
+        function deleteImage(imageId) {
+            if (confirm('Are you sure you want to delete this image?')) {
+                fetch(`/Admin/Movie/DeleteImage/${imageId}`, {
+                    method: 'POST',
+                }).then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    }
+                });
+            }
+        }
+    </script>
+}

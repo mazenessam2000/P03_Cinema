@@ -1,0 +1,101 @@
+﻿@model IEnumerable<Category>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between mb-4">
+        <h4>Categories</h4>
+        <a asp-action="Create" class="btn btn-primary">+ Add</a>
+    </div>
+
+    <div class="row g-4">
+        @foreach (var cat in Model)
+        {
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm text-white">
+                    <img src="~/Assets/Admin/img/category/@cat.ImageUrl"
+                         class="card-img"
+                         style="height:200px; object-fit:cover;">
+
+                    <div class="card-img-overlay d-flex flex-column justify-content-end"
+                         style="background: rgba(0,0,0,0.4);">
+
+                        <h5 class="category-name-glow">@cat.Name</h5>
+                        <p class="small">@cat.Description</p>
+
+                        <div>
+                            <a asp-action="Update" asp-route-id="@cat.Id" class="btn btn-sm btn-light">Edit</a>
+                            <a href="#" onclick="deleteCategory(event,@cat.Id)" class="btn btn-sm btn-danger">Delete</a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- ✅ PAGINATION -->
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+
+            <!-- Previous -->
+            <li class="page-item @(ViewBag.CurrentPage <= 1 ? "disabled" : "")">
+                <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@(ViewBag.CurrentPage - 1)">
+                    Previous
+                </a>
+            </li>
+
+            <!-- Page Numbers -->
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="@i">
+                        @i
+                    </a>
+                </li>
+            }
+
+            <!-- Next -->
+            <li class="page-item @(ViewBag.CurrentPage >= ViewBag.TotalPages ? "disabled" : "")">
+                <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@(ViewBag.CurrentPage + 1)">
+                    Next
+                </a>
+            </li>
+
+        </ul>
+
+        <div class="text-center text-muted mt-2">
+            Page @ViewBag.CurrentPage of @ViewBag.TotalPages
+        </div>
+    </nav>
+</div>
+
+@section Styles {
+    <style>
+        .category-name-glow {
+            color: LightGrey;
+            text-shadow: 0 0 5px red;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        function deleteCategory(e, id) {
+            e.preventDefault();
+
+            if (!confirm("Delete this category?")) return;
+
+            fetch(`/Admin/Category/Delete/${id}`, {
+                method: "POST"
+            })
+            .then(r => {
+                if (r.ok) location.reload();
+            });
+        }
+    </script>
+}

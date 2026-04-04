@@ -1,0 +1,191 @@
+﻿@model DashboardVM
+
+<div class="container-fluid py-4">
+
+    <!-- Top Stats -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-primary bg-gradient text-white">
+                <div class="card-body">
+                    <h6 class="text-white-50">Tickets Sold</h6>
+                    <h2 class="fw-bold">@Model.TicketsSold</h2>
+                    <span class="badge bg-light text-primary">Live</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-success bg-gradient text-white">
+                <div class="card-body">
+                    <h6 class="text-white-50">Revenue</h6>
+                    <h2 class="fw-bold">$@Model.Revenue</h2>
+                    <span class="badge bg-light text-success">Updated</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-warning bg-gradient text-dark">
+                <div class="card-body">
+                    <h6 class="text-dark-50">Available Seats</h6>
+                    <h2 class="fw-bold">@Model.AvailableSeats</h2>
+                    <span class="badge bg-dark text-warning">Now</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-dark text-white">
+                <div class="card-body">
+                    <h6 class="text-white-50">Active Movies</h6>
+                    <h2 class="fw-bold">@Model.ActiveMovies</h2>
+                    <span class="badge bg-secondary">Live</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Charts -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">🎟 Weekly Sales</h5>
+                    <canvas id="salesChart" height="120"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">🍿 Movie Share</h5>
+                    <canvas id="moviesChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Showtimes -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title mb-3">🎬 Today's Showtimes</h5>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Movie</th>
+                            <th>Hall</th>
+                            <th>Time</th>
+                            <th>Progress</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model.Showtimes)
+                        {
+                            <tr>
+                                <td>@item.Movie</td>
+                                <td>@item.Hall</td>
+                                <td>@item.Time</td>
+                                <td>
+                                    <div class="progress" style="height:6px;">
+                                        <div class="progress-bar bg-@item.StatusClass"
+                                             style="width:@item.Progress%">
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-@item.StatusClass">
+                                        @item.Status
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Bottom Section -->
+    <div class="row g-3">
+
+        <!-- Alerts -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">🚨 Alerts</h5>
+
+                    @foreach (var alert in Model.Alerts)
+                    {
+                        <div class="alert alert-warning">@alert</div>
+                    }
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">📈 Activity</h5>
+
+                    <ul class="list-group list-group-flush">
+                        @foreach (var act in Model.Activities)
+                        {
+                            <li class="list-group-item">
+                                @act.Text
+                                <span class="float-end text-muted">@act.TimeAgo</span>
+                            </li>
+                        }
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        const labels = @Html.Raw(Json.Serialize(Model.Showtimes.Select(x => x.Movie)));
+        const dataValues = @Html.Raw(Json.Serialize(Model.Showtimes.Select(x => x.Progress)));
+
+        const ctx = document.getElementById("salesChart");
+
+        if (ctx) {
+        new Chart(ctx, {
+        type: 'bar',
+        data: {
+        labels: labels,
+        datasets: [{
+        label: 'Occupancy %',
+        data: dataValues,
+        backgroundColor: ['#dc3545', '#ffc107', '#198754', '#0dcaf0']
+        }]
+        },
+        options: {
+        responsive: true,
+        plugins: {
+        legend: { display: false }
+        }
+        }
+        });
+        }
+    </script>
+}

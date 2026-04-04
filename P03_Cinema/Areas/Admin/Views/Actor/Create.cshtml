@@ -1,0 +1,70 @@
+﻿@model ActorCreateVM
+
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Create Actor</h2>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <form asp-action="Create" method="post" enctype="multipart/form-data">
+
+                <!-- Full Name -->
+                <div class="mb-3">
+                    <label asp-for="Actor.FullName" class="form-label"></label>
+                    <input asp-for="Actor.FullName" class="form-control" required />
+                </div>
+
+                <!-- Birth Date -->
+                <div class="mb-3">
+                    <label asp-for="Actor.BirthDate" class="form-label"></label>
+                    <input asp-for="Actor.BirthDate" type="date" class="form-control" />
+                </div>
+
+                <!-- Bio -->
+                <div class="mb-3">
+                    <label asp-for="Actor.Bio" class="form-label"></label>
+                    <textarea asp-for="Actor.Bio" class="form-control"></textarea>
+                </div>
+
+                <!-- Image -->
+                <div class="mb-3">
+                    <label class="form-label">Actor Image</label>
+                    <input asp-for="Img" type="file" class="form-control" accept="image/*" onchange="previewImage(event)" />
+
+                    <img id="preview" style="display:none; height:100px; margin-top:10px; object-fit:cover; border-radius:6px;" />
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-between mt-4">
+
+                    <a asp-action="Index" class="btn btn-outline-dark">
+                        ← Back
+                    </a>
+
+                    <div>
+                        <button type="reset" class="btn btn-outline-secondary me-2">Reset</button>
+                        <button type="submit" class="btn btn-primary">Create Actor</button>
+                    </div>
+
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function previewImage(event) {
+            const preview = document.getElementById('preview');
+            const file = event.target.files[0];
+            if (!file) return;
+
+            preview.src = URL.createObjectURL(file);
+            preview.style.display = 'block';
+        }
+    </script>
+}

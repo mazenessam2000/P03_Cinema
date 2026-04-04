@@ -1,0 +1,109 @@
+﻿@model CinemaCreateVM
+
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Update Cinema</h2>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <form asp-action="Update" method="post" enctype="multipart/form-data">
+
+                <!-- ✅ REQUIRED: Hidden fields -->
+                <input type="hidden" asp-for="Cinema.Id" />
+
+                <!-- Cinema Name -->
+                <div class="mb-3">
+                    <label asp-for="Cinema.Name" class="form-label"></label>
+                    <input asp-for="Cinema.Name" class="form-control" required />
+                    <span asp-validation-for="Cinema.Name" class="text-danger"></span>
+                </div>
+
+                <!-- Location -->
+                <div class="mb-3">
+                    <label asp-for="Cinema.Location" class="form-label"></label>
+                    <input asp-for="Cinema.Location" class="form-control" required />
+                    <span asp-validation-for="Cinema.Location" class="text-danger"></span>
+                </div>
+
+                <!-- Rating -->
+                <div class="mb-3">
+                    <label asp-for="Cinema.Rate" class="form-label"></label>
+                    <input asp-for="Cinema.Rate" class="form-control text-muted" readonly />
+                    <div class="form-text">Rating is calculated automatically.</div>
+                </div>
+
+                <!-- Active -->
+                <div class="mb-3 form-check form-switch">
+                    <input asp-for="Cinema.IsActive" class="form-check-input" />
+                    <label asp-for="Cinema.IsActive" class="form-check-label"></label>
+                </div>
+
+                <!-- Image Upload -->
+                <div class="mb-3">
+                    <label class="form-label">Cinema Image</label>
+                    <input asp-for="Img" type="file" class="form-control" accept="image/*" />
+
+                    @if (!string.IsNullOrEmpty(Model.Cinema.ImageUrl))
+                    {
+                        <div class="mt-2">
+                            <img src="~/Assets/Admin/img/cinema/@Model.Cinema.ImageUrl"
+                                 style="height:100px; object-fit:cover; border-radius:6px;" />
+                            <div class="form-text">
+                                Current image — upload a new one to replace it
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Movies Multi Select -->
+                <div class="mb-3">
+                    <label class="form-label">Select Movies</label>
+                    <select class="form-select select2" name="SelectedMovieIds" multiple>
+                        @foreach (var movie in Model.AllMovies)
+                        {
+                            <option value="@movie.Id"
+                                    selected="@(Model.SelectedMovieIds != null && Model.SelectedMovieIds.Contains(movie.Id))">
+                                @movie.Name
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-between mt-4">
+
+                    <a asp-area="Admin"
+                           asp-controller="Cinema"
+                           asp-action="Index"
+                           class="btn btn-outline-dark">
+                        ← Back
+                    </a>
+
+                    <div>
+                        <button type="reset" class="btn btn-outline-secondary me-2">Reset</button>
+                        <button type="submit" class="btn btn-primary">Update Cinema</button>
+                    </div>
+
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2({
+                placeholder: "Search and select movies...",
+                allowClear: true,
+                width: '100%'
+            });
+        });
+    </script>
+}

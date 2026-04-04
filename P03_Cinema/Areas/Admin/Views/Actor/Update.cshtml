@@ -1,0 +1,68 @@
+﻿@model ActorCreateVM
+
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Update Actor</h2>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <form asp-action="Update" method="post" enctype="multipart/form-data">
+
+                <input type="hidden" asp-for="Actor.Id" />
+
+                <!-- Full Name -->
+                <div class="mb-3">
+                    <label asp-for="Actor.FullName" class="form-label"></label>
+                    <input asp-for="Actor.FullName" class="form-control" />
+                </div>
+
+                <!-- Birth Date -->
+                <div class="mb-3">
+                    <label asp-for="Actor.BirthDate" class="form-label"></label>
+                    <input asp-for="Actor.BirthDate" type="date" class="form-control" />
+                </div>
+
+                <!-- Bio -->
+                <div class="mb-3">
+                    <label asp-for="Actor.Bio" class="form-label"></label>
+                    <textarea asp-for="Actor.Bio" class="form-control"></textarea>
+                </div>
+
+                <!-- Image -->
+                <div class="mb-3">
+                    <label class="form-label">Actor Image</label>
+                    <input asp-for="Img" type="file" class="form-control" />
+
+                    @if (!string.IsNullOrEmpty(Model.Actor.ImageUrl))
+                    {
+                        <div class="mt-2">
+                            <img src="~/Assets/Admin/img/actor/@Model.Actor.ImageUrl"
+                                 style="height:100px; object-fit:cover; border-radius:6px;" />
+                            <div class="form-text">
+                                Current image — upload new to replace
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-between mt-4">
+
+                    <a asp-action="Index" class="btn btn-outline-dark">
+                        ← Back
+                    </a>
+
+                    <div>
+                        <button type="reset" class="btn btn-outline-secondary me-2">Reset</button>
+                        <button type="submit" class="btn btn-primary">Update Actor</button>
+                    </div>
+
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

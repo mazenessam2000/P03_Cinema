@@ -1,0 +1,97 @@
+﻿@model MovieCreateVM
+
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Create Movie</h2>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form asp-action="Create" method="post" enctype="multipart/form-data">
+
+                <!-- 🔴 SHOW ERRORS -->
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                <!-- Name -->
+                <div class="mb-3">
+                    <label asp-for="Movie.Name" class="form-label"></label>
+                    <input asp-for="Movie.Name" class="form-control" />
+                </div>
+
+                <!-- Description -->
+                <div class="mb-3">
+                    <label asp-for="Movie.Description" class="form-label"></label>
+                    <textarea asp-for="Movie.Description" class="form-control"></textarea>
+                </div>
+
+                <!-- Price -->
+                <div class="mb-3">
+                    <label asp-for="Movie.Price" class="form-label"></label>
+                    <input asp-for="Movie.Price" class="form-control" />
+                </div>
+
+                <!-- Release Date -->
+                <div class="mb-3">
+                    <label asp-for="Movie.ReleaseDate" class="form-label"></label>
+                    <input asp-for="Movie.ReleaseDate" type="date" class="form-control" />
+                </div>
+
+                <!-- Status -->
+                <div class="mb-3">
+                    <label asp-for="Movie.Status" class="form-label"></label>
+                    <input asp-for="Movie.Status" class="form-control" />
+                </div>
+
+                <!-- Main Image -->
+                <div class="mb-3">
+                    <label class="form-label">Main Image</label>
+                    <input asp-for="MainImg" type="file" class="form-control" />
+                </div>
+
+                <!-- Gallery -->
+                <div class="mb-3">
+                    <label class="form-label">Gallery</label>
+                    <input asp-for="Gallery" type="file" multiple class="form-control" />
+                </div>
+
+                <!-- Actors -->
+                <div class="mb-3">
+                    <label class="form-label">Actors</label>
+                    <select asp-for="SelectedActors"
+                            asp-items="@(new MultiSelectList(Model.AllActors, "Id", "FullName"))"
+                            class="form-select select2"
+                            multiple>
+                    </select>
+                </div>
+
+                <!-- Categories -->
+                <div class="mb-3">
+                    <label class="form-label">Categories</label>
+                    <select asp-for="SelectedCategories"
+                            asp-items="@(new MultiSelectList(Model.AllCategories, "Id", "Name"))"
+                            class="form-select select2"
+                            multiple>
+                    </select>
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Index" class="btn btn-outline-dark">← Back</a>
+                    <div>
+                        <button type="reset" class="btn btn-outline-secondary me-2">Reset</button>
+                        <button type="submit" class="btn btn-primary">Create Movie</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $('.select2').select2({
+            width: '100%'
+        });
+    </script>
+}

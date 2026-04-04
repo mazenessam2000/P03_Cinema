@@ -1,0 +1,68 @@
+﻿@model CategoryCreateVM
+
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Update Category</h2>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <form asp-action="Update" method="post" enctype="multipart/form-data">
+
+                <input type="hidden" asp-for="Category.Id" />
+
+                <!-- Name -->
+                <div class="mb-3">
+                    <label asp-for="Category.Name" class="form-label"></label>
+                    <input asp-for="Category.Name" class="form-control" />
+                </div>
+
+                <!-- Description -->
+                <div class="mb-3">
+                    <label asp-for="Category.Description" class="form-label"></label>
+                    <textarea asp-for="Category.Description" class="form-control"></textarea>
+                </div>
+
+                <!-- Active -->
+                <div class="mb-3 form-check form-switch">
+                    <input asp-for="Category.IsActive" class="form-check-input" />
+                    <label asp-for="Category.IsActive" class="form-check-label"></label>
+                </div>
+
+                <!-- Image -->
+                <div class="mb-3">
+                    <label class="form-label">Category Image</label>
+                    <input asp-for="Img" type="file" class="form-control" />
+
+                    @if (!string.IsNullOrEmpty(Model.Category.ImageUrl))
+                    {
+                        <div class="mt-2">
+                            <img src="~/Assets/Admin/img/category/@Model.Category.ImageUrl"
+                                 style="height:100px; object-fit:cover; border-radius:6px;" />
+                            <div class="form-text">
+                                Current image — upload new to replace
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-between mt-4">
+
+                    <a asp-action="Index" class="btn btn-outline-dark">
+                        ← Back
+                    </a>
+
+                    <div>
+                        <button type="reset" class="btn btn-outline-secondary me-2">Reset</button>
+                        <button type="submit" class="btn btn-primary">Update Category</button>
+                    </div>
+
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
