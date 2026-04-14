@@ -1,0 +1,33 @@
+﻿@model ShowTimeUpdateVM
+
+<div class="container py-4">
+    <h2>Update ShowTime</h2>
+
+    <form asp-action="Update" method="post">
+
+        <input type="hidden" asp-for="Id" />
+
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+        <div class="mb-3">
+            <label>Movie</label>
+            <select asp-for="MovieId"
+                    asp-items="@(new SelectList(Model.Movies, "Id", "Name", Model.MovieId))"
+                    class="form-select"></select>
+        </div>
+
+        <div class="mb-3">
+            <label>Cinema</label>
+            <select asp-for="CinemaId"
+                    asp-items="@(new SelectList(Model.Cinemas, "Id", "Name", Model.CinemaId))"
+                    class="form-select"></select>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="StartTime"></label>
+            <input asp-for="StartTime" type="datetime-local" class="form-control" />
+        </div>
+
+        <button class="btn btn-primary">Update</button>
+    </form>
+</div>

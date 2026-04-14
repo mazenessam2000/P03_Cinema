@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Category>
+﻿@model CategoryIndexVM
 
 <div class="container-fluid">
     <div class="d-flex justify-content-between mb-4">
@@ -6,72 +6,78 @@
         <a asp-action="Create" class="btn btn-primary">+ Add</a>
     </div>
 
-    <div class="row g-4">
-        @foreach (var cat in Model)
-        {
-            <div class="col-md-4">
-                <div class="card border-0 shadow-sm text-white">
-                    <img src="~/Assets/Admin/img/category/@cat.ImageUrl"
-                         class="card-img"
-                         style="height:200px; object-fit:cover;">
+    <form method="get" asp-action="Index" class="mb-4">
+        <div class="input-group" style="max-width:400px;">
+            <input type="text" name="q" value="@Model.SearchQuery"
+                   class="form-control" placeholder="Search categories by name..." />
+            <button class="btn btn-outline-primary" type="submit">
+                <span class="fas fa-search"></span>
+            </button>
+            @if (!string.IsNullOrEmpty(Model.SearchQuery))
+            {
+                <a asp-action="Index" class="btn btn-outline-secondary">Clear</a>
+            }
+        </div>
+    </form>
 
-                    <div class="card-img-overlay d-flex flex-column justify-content-end"
-                         style="background: rgba(0,0,0,0.4);">
-
-                        <h5 class="category-name-glow">@cat.Name</h5>
-                        <p class="small">@cat.Description</p>
-
-                        <div>
-                            <a asp-action="Update" asp-route-id="@cat.Id" class="btn btn-sm btn-light">Edit</a>
-                            <a href="#" onclick="deleteCategory(event,@cat.Id)" class="btn btn-sm btn-danger">Delete</a>
+    @if (!Model.Categories.Any())
+    {
+        <div class="text-center text-muted py-5">
+            <span class="fas fa-tags fa-2x mb-3 d-block"></span>
+            No categories found@(!string.IsNullOrEmpty(Model.SearchQuery) ? $" for \"{Model.SearchQuery}\"" : "").
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var cat in Model.Categories)
+            {
+                <div class="col-md-4" id="category-@cat.Id">
+                    <div class="card border-0 shadow-sm text-white">
+                        <img src="~/Assets/Admin/img/category/@cat.ImageUrl"
+                             class="card-img" style="height:200px; object-fit:cover;">
+                        <div class="card-img-overlay d-flex flex-column justify-content-end"
+                             style="background: rgba(0,0,0,0.4);">
+                            <h5 class="category-name-glow">@cat.Name</h5>
+                            <p class="small">@cat.Description</p>
+                            <div>
+                                <a asp-action="Update" asp-route-id="@cat.Id" class="btn btn-sm btn-light">Edit</a>
+                                <a href="#" onclick="deleteCategory(event,@cat.Id)" class="btn btn-sm btn-danger">Delete</a>
+                            </div>
                         </div>
-
                     </div>
                 </div>
-            </div>
-        }
-    </div>
-
-    <!-- ✅ PAGINATION -->
-    <nav class="mt-4">
-        <ul class="pagination justify-content-center">
-
-            <!-- Previous -->
-            <li class="page-item @(ViewBag.CurrentPage <= 1 ? "disabled" : "")">
-                <a class="page-link"
-                       asp-action="Index"
-                       asp-route-page="@(ViewBag.CurrentPage - 1)">
-                    Previous
-                </a>
-            </li>
-
-            <!-- Page Numbers -->
-            @for (int i = 1; i <= ViewBag.TotalPages; i++)
-            {
-                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                    <a class="page-link"
-                           asp-action="Index"
-                           asp-route-page="@i">
-                        @i
-                    </a>
-                </li>
             }
-
-            <!-- Next -->
-            <li class="page-item @(ViewBag.CurrentPage >= ViewBag.TotalPages ? "disabled" : "")">
-                <a class="page-link"
-                       asp-action="Index"
-                       asp-route-page="@(ViewBag.CurrentPage + 1)">
-                    Next
-                </a>
-            </li>
-
-        </ul>
-
-        <div class="text-center text-muted mt-2">
-            Page @ViewBag.CurrentPage of @ViewBag.TotalPages
         </div>
-    </nav>
+
+
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item @(Model.CurrentPage <= 1 ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index"
+                       asp-route-page="@(Model.CurrentPage - 1)"
+                       asp-route-q="@Model.SearchQuery">Previous</a>
+                </li>
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                        <a class="page-link" asp-action="Index"
+                           asp-route-page="@i"
+                           asp-route-q="@Model.SearchQuery">@i</a>
+                    </li>
+                }
+                <li class="page-item @(Model.CurrentPage >= Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index"
+                       asp-route-page="@(Model.CurrentPage + 1)"
+                       asp-route-q="@Model.SearchQuery">Next</a>
+                </li>
+            </ul>
+            <div class="text-center text-muted mt-2">
+                Page @Model.CurrentPage of @Model.TotalPages
+            </div>
+        </nav>
+    }
+    
 </div>
 
 @section Styles {
@@ -87,15 +93,17 @@
     <script>
         function deleteCategory(e, id) {
             e.preventDefault();
-
             if (!confirm("Delete this category?")) return;
-
-            fetch(`/Admin/Category/Delete/${id}`, {
-                method: "POST"
-            })
-            .then(r => {
-                if (r.ok) location.reload();
-            });
+            fetch(`/Admin/Category/Delete/${id}`, { method: "POST" })
+                .then(r => {
+                    if (r.ok) {
+                        showToast("Category deleted successfully!", "success");
+                        const el = document.getElementById(`category-${id}`);
+                        if (el) el.remove();
+                    } else {
+                        showToast("Error occurred", "error");
+                    }
+                });
         }
     </script>
 }

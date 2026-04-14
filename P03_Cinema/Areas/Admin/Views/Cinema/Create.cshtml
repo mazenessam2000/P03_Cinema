@@ -2,87 +2,58 @@
 
 <div class="container-fluid py-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Create Cinema</h2>
-    </div>
-
+    <h2 class="mb-4">Create Cinema</h2>
 
     <div class="card shadow-sm">
         <div class="card-body">
-            <form asp-action="Create" method="POST" enctype="multipart/form-data">
 
-                <!-- Cinema Name -->
+            <form asp-action="Create" method="post" enctype="multipart/form-data">
+
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                <!-- Name -->
                 <div class="mb-3">
                     <label asp-for="Cinema.Name" class="form-label"></label>
-                    <input asp-for="Cinema.Name" class="form-control" placeholder="Enter cinema name" required />
+                    <input asp-for="Cinema.Name" class="form-control" />
                 </div>
 
                 <!-- Location -->
                 <div class="mb-3">
                     <label asp-for="Cinema.Location" class="form-label"></label>
-                    <input asp-for="Cinema.Location" class="form-control" placeholder="City, Country" required />
+                    <input asp-for="Cinema.Location" class="form-control" />
                 </div>
 
-                <!-- Rating (Read-only) -->
+                <!-- Total Seats (NEW IMPORTANT FIELD) -->
                 <div class="mb-3">
-                    <label asp-for="Cinema.Rate" class="form-label"></label>
-                    <input asp-for="Cinema.Rate" class="form-control text-muted" value="0" readonly />
-                    <div class="form-text">Rating is calculated automatically.</div>
+                    <label asp-for="Cinema.TotalSeats" class="form-label"></label>
+                    <input asp-for="Cinema.TotalSeats" class="form-control" />
                 </div>
 
-                <!-- Active toggle -->
-                <div class="mb-3 form-check form-switch">
-                    <input asp-for="Cinema.IsActive" class="form-check-input" type="checkbox" />
-                    <label asp-for="Cinema.IsActive" class="form-check-label">Active</label>
+                <!-- Active -->
+                <div class="form-check form-switch mb-3">
+                    <input asp-for="Cinema.IsActive" class="form-check-input" />
+                    <label asp-for="Cinema.IsActive" class="form-check-label"></label>
                 </div>
 
-                <!-- Image Upload -->
+                <!-- Image -->
                 <div class="mb-3">
-                    <label class="form-label">Cinema Image</label>
-                    <input asp-for="Img" type="file" class="form-control" accept="image/*" />
+                    <label asp-for="Img" class="form-label">Cinema Image</label>
+                    <input asp-for="Img" type="file" class="form-control" />
                 </div>
 
-                <!-- Movies Multi-Select -->
-                <div class="mb-3">
-                    <label class="form-label">Select Movies</label>
-                    <select class="form-select select2" name="SelectedMovieIds" multiple="multiple">
-                        @foreach (var movie in Model.AllMovies)
-                        {
-                            <option value="@movie.Id">@movie.Name</option>
-                        }
-                    </select>
-                </div>
-
-                <!-- Submit -->
+                <!-- Buttons -->
                 <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Index" class="btn btn-outline-dark">← Back</a>
 
-                    <a asp-area="Admin"
-                           asp-controller="Cinema"
-                           asp-action="Index"
-                           class="btn btn-outline-dark">
-                        ← Back to Cinemas
-                    </a>
-
-                    <div>
-                        <button type="reset" class="btn btn-outline-secondary me-2">Reset</button>
-                        <button type="submit" class="btn btn-primary">Add Cinema</button>
-                    </div>
-
+                    <button type="submit" class="btn btn-primary">Add Cinema</button>
                 </div>
 
             </form>
+
         </div>
     </div>
 </div>
 
 @section Scripts {
-    <script>
-        $(document).ready(function() {
-            $('.select2').select2({
-                placeholder: "Search and select movies...",
-                allowClear: true,
-                width: '100%'
-            });
-        });
-    </script>
+    <partial name="_ValidationScriptsPartial" />
 }
