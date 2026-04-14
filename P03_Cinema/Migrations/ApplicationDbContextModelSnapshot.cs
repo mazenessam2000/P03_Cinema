@@ -53,6 +53,33 @@ namespace P03_Cinema.Migrations
                     b.ToTable("Actors");
                 });
 
+            modelBuilder.Entity("P03_Cinema.Models.Booking", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("BookingDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SeatsCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ShowTimeId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ShowTimeId");
+
+                    b.ToTable("Booking");
+                });
+
             modelBuilder.Entity("P03_Cinema.Models.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -113,24 +140,12 @@ namespace P03_Cinema.Migrations
                     b.Property<double>("Rate")
                         .HasColumnType("float");
 
+                    b.Property<int>("TotalSeats")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("Cinemas");
-                });
-
-            modelBuilder.Entity("P03_Cinema.Models.CinemaMovie", b =>
-                {
-                    b.Property<int>("CinemaId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MovieId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CinemaId", "MovieId");
-
-                    b.HasIndex("MovieId");
-
-                    b.ToTable("CinemaMovies");
                 });
 
             modelBuilder.Entity("P03_Cinema.Models.Movie", b =>
@@ -145,6 +160,9 @@ namespace P03_Cinema.Migrations
                         .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("DurationMinutes")
+                        .HasColumnType("int");
 
                     b.Property<string>("MainImage")
                         .HasMaxLength(250)
@@ -224,23 +242,45 @@ namespace P03_Cinema.Migrations
                     b.ToTable("MovieImages");
                 });
 
-            modelBuilder.Entity("P03_Cinema.Models.CinemaMovie", b =>
+            modelBuilder.Entity("P03_Cinema.Models.ShowTime", b =>
                 {
-                    b.HasOne("P03_Cinema.Models.Cinema", "Cinema")
-                        .WithMany("CinemaMovies")
-                        .HasForeignKey("CinemaId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AvailableSeats")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CinemaId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MovieId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CinemaId");
+
+                    b.HasIndex("MovieId", "CinemaId", "StartTime")
+                        .IsUnique();
+
+                    b.ToTable("ShowTimes");
+                });
+
+            modelBuilder.Entity("P03_Cinema.Models.Booking", b =>
+                {
+                    b.HasOne("P03_Cinema.Models.ShowTime", "ShowTime")
+                        .WithMany("Bookings")
+                        .HasForeignKey("ShowTimeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("P03_Cinema.Models.Movie", "Movie")
-                        .WithMany("CinemaMovies")
-                        .HasForeignKey("MovieId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Cinema");
-
-                    b.Navigation("Movie");
+                    b.Navigation("ShowTime");
                 });
 
             modelBuilder.Entity("P03_Cinema.Models.MovieActor", b =>
@@ -292,6 +332,25 @@ namespace P03_Cinema.Migrations
                     b.Navigation("Movie");
                 });
 
+            modelBuilder.Entity("P03_Cinema.Models.ShowTime", b =>
+                {
+                    b.HasOne("P03_Cinema.Models.Cinema", "Cinema")
+                        .WithMany("ShowTimes")
+                        .HasForeignKey("CinemaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("P03_Cinema.Models.Movie", "Movie")
+                        .WithMany("ShowTimes")
+                        .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Cinema");
+
+                    b.Navigation("Movie");
+                });
+
             modelBuilder.Entity("P03_Cinema.Models.Actor", b =>
                 {
                     b.Navigation("MovieActors");
@@ -304,18 +363,23 @@ namespace P03_Cinema.Migrations
 
             modelBuilder.Entity("P03_Cinema.Models.Cinema", b =>
                 {
-                    b.Navigation("CinemaMovies");
+                    b.Navigation("ShowTimes");
                 });
 
             modelBuilder.Entity("P03_Cinema.Models.Movie", b =>
                 {
-                    b.Navigation("CinemaMovies");
-
                     b.Navigation("Images");
 
                     b.Navigation("MovieActors");
 
                     b.Navigation("MovieCategories");
+
+                    b.Navigation("ShowTimes");
+                });
+
+            modelBuilder.Entity("P03_Cinema.Models.ShowTime", b =>
+                {
+                    b.Navigation("Bookings");
                 });
 #pragma warning restore 612, 618
         }

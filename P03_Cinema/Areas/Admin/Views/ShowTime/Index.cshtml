@@ -1,0 +1,138 @@
+﻿@model ShowTimeIndexVM
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between mb-4">
+        <h4>ShowTimes</h4>
+        <a asp-action="Create" class="btn btn-primary">+ Add ShowTime</a>
+    </div>
+
+    <!-- 🔍 SEARCH -->
+    <form method="get" asp-action="Index" class="mb-4">
+        <div class="input-group" style="max-width:400px;">
+            <input type="text" name="q" value="@Model.SearchQuery"
+                   class="form-control" placeholder="Search by movie or cinema..." />
+
+            <button class="btn btn-outline-primary" type="submit">Search</button>
+
+            @if (!string.IsNullOrEmpty(Model.SearchQuery))
+            {
+                <a asp-action="Index" class="btn btn-outline-secondary">Clear</a>
+            }
+        </div>
+    </form>
+
+    @if (!Model.ShowTimes.Any())
+    {
+        <div class="text-center text-muted py-5">
+            No showtimes found.
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+
+            @foreach (var s in Model.ShowTimes)
+            {
+                <div class="col-md-3" id="show-@s.Id">
+
+                    <div class="card shadow-sm border-0 h-100">
+
+                        <!-- 🎬 MOVIE IMAGE -->
+                        <img src="~/Assets/Admin/img/movie/@s.Movie.MainImage"
+                             class="card-img-top"
+                             style="height:140px; object-fit:cover;" />
+
+                        <div class="card-body">
+
+                            <h5 class="mb-1">@s.Movie.Name</h5>
+
+                            <p class="text-muted small mb-2">
+                                @s.Cinema.Name
+                            </p>
+
+                            <p class="mb-1">
+                                <strong>Time:</strong><br />
+                                @s.StartTime.ToString("yyyy-MM-dd HH:mm")
+                            </p>
+
+                            <p class="mb-3">
+                                <strong>Seats:</strong> @s.AvailableSeats
+                            </p>
+
+                            <div class="d-flex gap-2">
+                                <a asp-action="Update"
+                                       asp-route-id="@s.Id"
+                                       class="btn btn-sm btn-light">
+                                    Edit
+                                </a>
+
+                                <button class="btn btn-sm btn-danger"
+                                        onclick="deleteShowTime(@s.Id)">
+                                    Delete
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+
+        <!-- 🔢 PAGINATION -->
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+
+                <li class="page-item @(Model.CurrentPage <= 1 ? "disabled" : "")">
+                    <a class="page-link"
+                           asp-route-page="@(Model.CurrentPage - 1)"
+                           asp-route-q="@Model.SearchQuery">
+                        Previous
+                    </a>
+                </li>
+
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                        <a class="page-link"
+                               asp-route-page="@i"
+                               asp-route-q="@Model.SearchQuery">
+                            @i
+                        </a>
+                    </li>
+                }
+
+                <li class="page-item @(Model.CurrentPage >= Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link"
+                           asp-route-page="@(Model.CurrentPage + 1)"
+                           asp-route-q="@Model.SearchQuery">
+                        Next
+                    </a>
+                </li>
+
+            </ul>
+
+            <div class="text-center text-muted mt-2">
+                Page @Model.CurrentPage of @Model.TotalPages
+            </div>
+        </nav>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function deleteShowTime(id) {
+            if (!confirm("Delete this showtime?")) return;
+
+            fetch(`/Admin/ShowTime/Delete/${id}`, {
+                method: "POST"
+            })
+            .then(r => {
+                if (r.ok) {
+                    document.getElementById(`show-${id}`).remove();
+                }
+            });
+        }
+    </script>
+}
