@@ -53,7 +53,8 @@ namespace P03_Cinema.Migrations
                     Location = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     ImageUrl = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     Rate = table.Column<double>(type: "float", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    TotalSeats = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -71,35 +72,12 @@ namespace P03_Cinema.Migrations
                     Price = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     ReleaseDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     MainImage = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    DurationMinutes = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Movies", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "CinemaMovies",
-                columns: table => new
-                {
-                    CinemaId = table.Column<int>(type: "int", nullable: false),
-                    MovieId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CinemaMovies", x => new { x.CinemaId, x.MovieId });
-                    table.ForeignKey(
-                        name: "FK_CinemaMovies_Cinemas_CinemaId",
-                        column: x => x.CinemaId,
-                        principalTable: "Cinemas",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CinemaMovies_Movies_MovieId",
-                        column: x => x.MovieId,
-                        principalTable: "Movies",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -170,10 +148,60 @@ namespace P03_Cinema.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "ShowTimes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AvailableSeats = table.Column<int>(type: "int", nullable: false),
+                    MovieId = table.Column<int>(type: "int", nullable: false),
+                    CinemaId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ShowTimes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ShowTimes_Cinemas_CinemaId",
+                        column: x => x.CinemaId,
+                        principalTable: "Cinemas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ShowTimes_Movies_MovieId",
+                        column: x => x.MovieId,
+                        principalTable: "Movies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Booking",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ShowTimeId = table.Column<int>(type: "int", nullable: false),
+                    SeatsCount = table.Column<int>(type: "int", nullable: false),
+                    TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    BookingDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Booking", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Booking_ShowTimes_ShowTimeId",
+                        column: x => x.ShowTimeId,
+                        principalTable: "ShowTimes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
-                name: "IX_CinemaMovies_MovieId",
-                table: "CinemaMovies",
-                column: "MovieId");
+                name: "IX_Booking_ShowTimeId",
+                table: "Booking",
+                column: "ShowTimeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MovieActors_ActorId",
@@ -189,13 +217,24 @@ namespace P03_Cinema.Migrations
                 name: "IX_MovieImages_MovieId",
                 table: "MovieImages",
                 column: "MovieId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ShowTimes_CinemaId",
+                table: "ShowTimes",
+                column: "CinemaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ShowTimes_MovieId_CinemaId_StartTime",
+                table: "ShowTimes",
+                columns: new[] { "MovieId", "CinemaId", "StartTime" },
+                unique: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "CinemaMovies");
+                name: "Booking");
 
             migrationBuilder.DropTable(
                 name: "MovieActors");
@@ -207,13 +246,16 @@ namespace P03_Cinema.Migrations
                 name: "MovieImages");
 
             migrationBuilder.DropTable(
-                name: "Cinemas");
+                name: "ShowTimes");
 
             migrationBuilder.DropTable(
                 name: "Actors");
 
             migrationBuilder.DropTable(
                 name: "Categories");
+
+            migrationBuilder.DropTable(
+                name: "Cinemas");
 
             migrationBuilder.DropTable(
                 name: "Movies");

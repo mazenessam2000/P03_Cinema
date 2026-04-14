@@ -17,8 +17,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<MovieImage> MovieImages { get; set; }
     public DbSet<MovieActor> MovieActors { get; set; }
     public DbSet<MovieCategory> MovieCategories { get; set; }
-    public DbSet<CinemaMovie> CinemaMovies { get; set; }
-    //public DbSet<ShowTime> ShowTimes { get; set; }
+    public DbSet<ShowTime> ShowTimes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

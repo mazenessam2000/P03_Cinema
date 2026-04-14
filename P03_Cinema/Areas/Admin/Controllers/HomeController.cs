@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
 namespace P03_Cinema.Areas.Admin.Controllers
 {
@@ -10,31 +9,76 @@ namespace P03_Cinema.Areas.Admin.Controllers
         {
             var vm = new DashboardVM
             {
-                TicketsSold = 1842,
-                Revenue = 12970,
-                AvailableSeats = 5126,
-                ActiveMovies = 18,
+                // 🔝 Top stats
+                TicketsSold = 1280,
+                Revenue = 25430.50m,
+                AvailableSeats = 560,
+                ActiveMovies = 12,
 
-                Showtimes = new List<ShowtimeVM>
-        {
-            new ShowtimeVM { Movie="Avengers", Hall="Hall 1", Time="21:00", Progress=95, Status="Almost Full", StatusClass="danger" },
-            new ShowtimeVM { Movie="Dune 3", Hall="Hall 2", Time="18:30", Progress=75, Status="Busy", StatusClass="warning" },
-            new ShowtimeVM { Movie="Joker", Hall="Hall 3", Time="17:00", Progress=50, Status="Available", StatusClass="success" },
-        },
+                // 📊 Weekly Sales
+                WeeklyLabels = new List<string>
+                {
+                    "Mon","Tue","Wed","Thu","Fri","Sat","Sun"
+                },
+                WeeklySales = new List<int>
+                {
+                    120, 180, 150, 220, 300, 400, 350
+                },
 
-                Alerts = new List<string>
-        {
-            "IMAX almost sold out",
-            "Projector issue in Hall 2",
-            "New movie ready to publish"
-        },
+                // 🍿 Movie share
+                MovieNames = new List<string>
+                {
+                    "Avengers", "Dune", "Joker", "Fast X", "Interstellar"
+                },
+                MovieSales = new List<int>
+                {
+                    45, 30, 25, 20, 35
+                },
 
+                // 🎬 Showtimes (STATIC FIXED)
+                Showtimes = new List<DashboardShowTimeVM>
+                {
+                    new DashboardShowTimeVM
+                    {
+                        MovieName = "Avengers",
+                        HallName = "Hall A",
+                        Time = "14:30",
+                        Progress = 40,
+                        Status = "Running"
+                    },
+                    new DashboardShowTimeVM
+                    {
+                        MovieName = "Dune",
+                        HallName = "Hall B",
+                        Time = "16:00",
+                        Progress = 0,
+                        Status = "Upcoming"
+                    },
+                    new DashboardShowTimeVM
+                    {
+                        MovieName = "Joker",
+                        HallName = "Hall C",
+                        Time = "11:00",
+                        Progress = 100,
+                        Status = "Finished"
+                    }
+                },
+
+                // 📈 Activity
                 Activities = new List<ActivityVM>
-        {
-            new ActivityVM { Text="3 tickets booked", TimeAgo="2m" },
-            new ActivityVM { Text="Payment $45", TimeAgo="10m" },
-            new ActivityVM { Text="Movie added", TimeAgo="25m" }
-        }
+                {
+                    new ActivityVM { Text = "New ticket sold", TimeAgo = "2 min ago" },
+                    new ActivityVM { Text = "Movie added: Dune", TimeAgo = "1 hour ago" },
+                    new ActivityVM { Text = "Cinema updated", TimeAgo = "3 hours ago" }
+                },
+
+                // 🚨 Alerts
+                Alerts = new List<string>
+                {
+                    "Low seats in Hall A",
+                    "Maintenance scheduled tomorrow",
+                    "High traffic detected"
+                }
             };
 
             return View(vm);
