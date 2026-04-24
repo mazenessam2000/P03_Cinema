@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using P03_Cinema.DataAccess.Configurations;
 
 namespace P03_Cinema.DataAccess;
 
-public class ApplicationDbContext : DbContext
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
@@ -18,6 +19,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<MovieActor> MovieActors { get; set; }
     public DbSet<MovieCategory> MovieCategories { get; set; }
     public DbSet<ShowTime> ShowTimes { get; set; }
+    public DbSet<ApplicationUserOTP> ApplicationUserOTPs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -1,27 +1,30 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")
     ));
+
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    options.User.RequireUniqueEmail = true;
+    options.Password.RequiredLength = 8;
+    options.SignIn.RequireConfirmedEmail = true;
+}).AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
 
 builder.Services.Configure<FileSettings>(
     builder.Configuration.GetSection("FileSettings"));
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IFileService, FileService>();
-
-//builder.Services.AddScoped<IRepository<Actor>, Repository<Actor>>();
-//builder.Services.AddScoped<IRepository<MovieActor>, Repository<MovieActor>>();
-//builder.Services.AddScoped<IRepository<Movie>, Repository<Movie>>();
-//builder.Services.AddScoped<IRepository<MovieCategory>, Repository<MovieCategory>>();
-//builder.Services.AddScoped<IRepository<Category>, Repository<Category>>();
-//builder.Services.AddScoped<IRepository<CinemaMovie>, Repository<CinemaMovie>>();
-//builder.Services.AddScoped<IRepository<Cinema>, Repository<Cinema>>();
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
@@ -30,6 +33,8 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICinemaService, CinemaService>();
 builder.Services.AddScoped<IMovieService, MovieService>();
 builder.Services.AddScoped<IShowTimeService, ShowTimeService>();
+
+builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 
 var app = builder.Build();
@@ -51,7 +56,7 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{area=Admin}/{controller=Home}/{action=Index}/{id?}")
+    pattern: "{area=customer}/{controller=home}/{action=index}/{id?}")
     .WithStaticAssets();
 
 
