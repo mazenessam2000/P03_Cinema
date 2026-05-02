@@ -1,0 +1,243 @@
+﻿@model DashboardVM
+
+<div class="container-fluid py-4">
+
+    <!-- Top Stats -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-primary bg-gradient text-white">
+                <div class="card-body">
+                    <h6 class="text-white-50">Tickets Sold</h6>
+                    <h2 class="fw-bold">@Model.TicketsSold</h2>
+                    <span class="badge bg-light text-primary">Live</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-success bg-gradient text-white">
+                <div class="card-body">
+                    <h6 class="text-white-50">Revenue</h6>
+                    <h2 class="fw-bold">$@Model.Revenue</h2>
+                    <span class="badge bg-light text-success">Updated</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-warning bg-gradient text-dark">
+                <div class="card-body">
+                    <h6 class="text-dark-50">Available Seats</h6>
+                    <h2 class="fw-bold">@Model.AvailableSeats</h2>
+                    <span class="badge bg-dark text-warning">Now</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-dark text-white">
+                <div class="card-body">
+                    <h6 class="text-white">Active Movies</h6>
+                    <h2 class="fw-bold text-white">@Model.ActiveMovies</h2>
+                    <span class="badge bg-secondary">Live</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Charts -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title mb-3">🎟 Weekly Sales</h5>
+                    <div class="flex-grow-1">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title mb-3">🍿 Movie Share</h5>
+                    <div class="flex-grow-1 d-flex align-items-center justify-content-center">
+                        <canvas id="moviesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Showtimes -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title mb-3">🎬 Today's Showtimes</h5>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Movie</th>
+                            <th>Hall</th>
+                            <th>Time</th>
+                            <th>Progress</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model.Showtimes)
+                        {
+                            <tr>
+                                <td>@item.MovieName</td>
+                                <td>@item.HallName</td>
+                                <td>@item.Time</td>
+
+                                <td style="width:200px;">
+                                    <div class="progress">
+                                        <div class="progress-bar bg-success"
+                                             style="width:@item.Progress%">
+                                            @item.Progress%
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <span class="badge
+                                        @(item.Status == "Running" ? "bg-success" :
+                                                                                    item.Status == "Upcoming" ? "bg-warning text-dark" :
+                                                                                    "bg-secondary")">
+                                        @item.Status
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Bottom Section -->
+    <div class="row g-3">
+
+        <!-- Alerts -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">🚨 Alerts</h5>
+
+                    @foreach (var alert in Model.Alerts)
+                    {
+                        <div class="alert alert-warning mb-2">
+                            @alert
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">📈 Activity</h5>
+
+                    <ul class="list-group list-group-flush">
+                        @foreach (var act in Model.Activities)
+                        {
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>@act.Text</span>
+                                <span class="text-muted">@act.TimeAgo</span>
+                            </li>
+                        }
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- SCRIPTS -->
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        const weeklyLabels = @Html.Raw(Json.Serialize(Model.WeeklyLabels));
+        const weeklyData = @Html.Raw(Json.Serialize(Model.WeeklySales));
+
+        const movieLabels = @Html.Raw(Json.Serialize(Model.MovieNames));
+        const movieData = @Html.Raw(Json.Serialize(Model.MovieSales));
+    </script>
+
+    <script>
+        const salesCtx = document.getElementById("salesChart");
+
+        if (salesCtx) {
+        new Chart(salesCtx, {
+        type: 'bar',
+        data: {
+        labels: weeklyLabels,
+        datasets: [{
+        label: 'Tickets Sold',
+        data: weeklyData,
+        backgroundColor: '#0d6efd'
+        }]
+        },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+        legend: { display: false }
+        }
+        }
+        });
+        }
+    </script>
+
+    <script>
+        const movieCtx = document.getElementById("moviesChart");
+
+        if (movieCtx) {
+        new Chart(movieCtx, {
+        type: 'doughnut',
+        data: {
+        labels: movieLabels,
+        datasets: [{
+        data: movieData,
+        backgroundColor: [
+        '#0d6efd',
+        '#198754',
+        '#dc3545',
+        '#ffc107',
+        '#0dcaf0'
+        ]
+        }]
+        },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '60%',
+        plugins: {
+        legend: {
+        position: 'bottom'
+        }
+        }
+        }
+        });
+        }
+    </script>
+}

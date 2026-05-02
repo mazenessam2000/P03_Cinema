@@ -1,0 +1,54 @@
+@model ValidateOTPVM
+@{
+    ViewData["Title"] = "Validate OTP";
+    ViewBag.BgImage = "/assets/admin/img/generic/17.jpg";
+    ViewBag.BgPosition = "50% 76%";
+    ViewBag.BgOverlay = true;
+}
+
+<div class="text-center">
+    <div class="mb-3">
+        <span class="fas fa-shield-alt fs-5 text-primary"></span>
+    </div>
+
+    <h4 class="mb-0">Validate OTP</h4>
+    <p class="fs-10 text-600">
+        Enter the 6-digit code sent to your email.
+    </p>
+
+    <form class="mb-3 mt-4" method="post" asp-action="ValidateOTP">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="UserId" />
+
+        <div class="mb-3">
+            <input asp-for="OTP"
+                   class="form-control text-center ls-2 fs-8 fw-bolder"
+                   placeholder="0 0 0 0 0 0"
+                   inputmode="numeric"
+                   maxlength="6"
+                   autofocus />
+            <span asp-validation-for="OTP" class="text-danger fs-10"></span>
+        </div>
+
+        <div asp-validation-summary="ModelOnly" class="text-danger fs-10 mb-3"></div>
+
+        <button class="btn btn-primary d-block w-100 mt-3" type="submit">
+            Validate &amp; Continue
+        </button>
+    </form>
+
+    <div class="mt-4">
+        <a class="fs-10 text-600" asp-action="ForgotPassword">
+            <i class="fas fa-chevron-left me-1"></i>Back to email entry
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<style>
+    .ls-2 { letter-spacing: 0.5rem !important; }
+    .validation-summary-errors ul { list-style: none; padding: 0; }
+</style>

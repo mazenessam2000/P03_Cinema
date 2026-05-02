@@ -1,0 +1,167 @@
+@model MovieDetailsVM
+
+<h2 class="mb-3">@Model.Name</h2>
+
+<div class="row">
+
+    <!-- LEFT: MAIN IMAGE + GALLERY -->
+    <div class="col-md-4">
+
+        <!-- MAIN IMAGE -->
+        <img src="@Url.Content($"~/assets/admin/img/movie/{Model.MainImage}")"
+             class="img-fluid rounded shadow-sm mb-3" />
+
+        <!-- GALLERY CAROUSEL -->
+        @if (Model.Images != null && Model.Images.Any())
+        {
+            <div id="movieGallery" class="carousel slide shadow-sm rounded" data-bs-ride="carousel">
+
+                <div class="carousel-inner">
+
+                    @for (int i = 0; i < Model.Images.Count; i++)
+                    {
+                        var img = Model.Images[i];
+
+                        <div class="carousel-item @(i == 0 ? "active" : "")">
+
+                            <img src="@Url.Content($"~/assets/admin/img/movie/{img}")"
+                                 class="d-block w-100 rounded"
+                                 style="height: 220px; object-fit: cover; cursor: pointer;"
+                                 onclick="openImage(this.src)" />
+
+                        </div>
+                    }
+
+                </div>
+
+                <button class="carousel-control-prev" type="button"
+                        data-bs-target="#movieGallery" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+
+                <button class="carousel-control-next" type="button"
+                        data-bs-target="#movieGallery" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+
+            </div>
+        }
+
+    </div>
+
+    <!-- RIGHT: INFO -->
+    <div class="col-md-8">
+
+        <p>@Model.Description</p>
+
+        <p><strong>Price:</strong> @Model.Price €</p>
+        <p><strong>Duration:</strong> @Model.DurationMinutes min</p>
+        <p><strong>Status:</strong> @Model.Status</p>
+
+        <p>
+            <strong>Categories:</strong>
+            @string.Join(", ", Model.Categories)
+        </p>
+
+    </div>
+</div>
+
+<hr />
+
+<!-- ACTORS -->
+<h4>🎭 Actors</h4>
+
+<div class="d-flex flex-wrap gap-3 mt-2">
+    @foreach (var actor in Model.Actors)
+    {
+        <div class="text-center">
+            <img src="@Url.Content($"~/assets/admin/img/actor/{actor.ImageUrl}")"
+                 width="70"
+                 height="70"
+                 class="rounded-circle shadow-sm"
+                 style="object-fit: cover;" />
+            <div class="small">@actor.Name</div>
+        </div>
+    }
+</div>
+
+<hr />
+
+<!-- SHOWTIMES -->
+<h4>🎟️ Showtimes</h4>
+
+@if (Model.ShowTimes != null && Model.ShowTimes.Any())
+{
+    <div class="row g-3 mt-2">
+
+        @foreach (var st in Model.ShowTimes)
+        {
+            <div class="col-md-4">
+
+                <div class="card border-0 shadow-sm h-100 p-3">
+
+                    <div class="text-muted small">
+                        🎬 @st.CinemaName
+                    </div>
+
+                    <div class="text-muted small">
+                        🏛 @st.HallName
+                    </div>
+
+                    <div class="fw-bold mt-2">
+                        🕐 @st.StartTime.ToString("ddd dd MMM - hh:mm tt")
+                    </div>
+
+                    <a asp-area="Customer"
+                           asp-controller="Cart"
+                           asp-action="SelectSeats"
+                           asp-route-showTimeId="@st.Id"
+                           class="btn btn-danger btn-sm mt-3 w-100">
+
+                        🎟 Buy Ticket
+                    </a>
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+}
+else
+{
+    <p class="text-muted">No showtimes available.</p>
+}
+
+<!-- IMAGE MODAL PREVIEW -->
+<div id="imgModal" class="img-modal" onclick="this.style.display='none'">
+    <img id="imgModalSrc" />
+</div>
+
+<style>
+    .img-modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.85);
+        justify-content: center;
+        align-items: center;
+    }
+
+        .img-modal img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 10px;
+        }
+</style>
+
+<script>
+    function openImage(src) {
+        document.getElementById("imgModal").style.display = "flex";
+        document.getElementById("imgModalSrc").src = src;
+    }
+</script>

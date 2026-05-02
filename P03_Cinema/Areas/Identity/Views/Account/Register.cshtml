@@ -1,0 +1,97 @@
+@{
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+    ViewData["Title"] = "Register";
+    ViewBag.BgImage = "/assets/admin/img/generic/19.jpg";
+}
+
+@model RegisterVM;
+
+<div class="row flex-between-center">
+    <div class="col-auto">
+        <h3>Register</h3>
+    </div>
+    <div class="col-auto fs-10 text-600">
+        <span class="mb-0 fw-semi-bold">Already User?</span>
+        <span><a asp-action="Login">Login</a></span>
+    </div>
+</div>
+
+<form method="post" asp-action="Register">
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label class="form-label" asp-for="FirstName"></label>
+        <input class="form-control" type="text" autocomplete="on" asp-for="FirstName" />
+        <span asp-validation-for="FirstName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" asp-for="LastName"></label>
+        <input class="form-control" type="text" autocomplete="on" asp-for="LastName" />
+        <span asp-validation-for="LastName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" asp-for="Username"></label>
+        <input class="form-control" type="text" autocomplete="on" asp-for="Username" />
+        <span asp-validation-for="Username" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" asp-for="Email"></label>
+        <input class="form-control" type="email" autocomplete="on" asp-for="Email" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="row gx-2">
+        <div class="mb-3 col-sm-6">
+            <label class="form-label" asp-for="Password"></label>
+            <input class="form-control" type="password" autocomplete="on" asp-for="Password" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3 col-sm-6">
+            <label class="form-label" asp-for="ConfirmPassword"></label>
+            <input class="form-control" type="password" autocomplete="on" asp-for="ConfirmPassword" />
+            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" asp-for="AgreeToTerms" />
+        <label class="form-label" asp-for="AgreeToTerms">
+            I accept the <a href="#!">terms</a> and <a class="white-space-nowrap" href="#!">privacy policy</a>
+        </label>
+        <span asp-validation-for="AgreeToTerms" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <button class="btn btn-primary d-block w-100 mt-3" type="submit">Register</button>
+    </div>
+</form>
+
+<div class="position-relative mt-4">
+    <hr />
+    <div class="divider-content-center">or register with</div>
+</div>
+
+<div class="row g-2 mt-2">
+    <div class="col-sm-6">
+        <a class="btn btn-outline-google-plus btn-sm d-block w-100" href="#">
+            <span class="fab fa-google-plus-g me-2" data-fa-transform="grow-8"></span> google
+        </a>
+    </div>
+    <div class="col-sm-6">
+        <a class="btn btn-outline-facebook btn-sm d-block w-100" href="#">
+            <span class="fab fa-facebook-square me-2" data-fa-transform="grow-8"></span> facebook
+        </a>
+    </div>
+</div>
+
+@section Scripts
+{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

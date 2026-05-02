@@ -6,128 +6,222 @@
         <a asp-action="Create" class="btn btn-primary">+ Add Movie</a>
     </div>
 
-    <div class="row g-4">
+    <form method="get" asp-action="Index" class="mb-4">
+        <div class="input-group" style="max-width:400px;">
+            <input type="text" name="q" value="@Model.SearchQuery"
+                   class="form-control" placeholder="Search movies by name..." />
 
-        @foreach (var movie in Model.Movies)
-        {
-            <div class="col-md-3 mb-4">
-                <div class="card border-0 shadow-sm text-white">
+            <button class="btn btn-outline-primary" type="submit">
+                <span class="fas fa-search"></span>
+            </button>
 
-                    <img src="~/Assets/Admin/img/movie/@movie.MainImage"
-                         class="card-img"
-                         style="height:360px; object-fit:cover;">
+            @if (!string.IsNullOrEmpty(Model.SearchQuery))
+            {
+                <a asp-action="Index" class="btn btn-outline-secondary">Clear</a>
+            }
+        </div>
+    </form>
 
-                    <div class="card-img-overlay d-flex flex-column justify-content-end"
-                         style="background: linear-gradient(to top, rgba(0,0,0,0.6), rgba(0,0,0,0.1)); padding:1rem;">
+    @if (!Model.Movies.Any())
+    {
+        <div class="text-center text-muted py-5">
+            <span class="fas fa-film fa-2x mb-3 d-block"></span>
+            No movies found@(!string.IsNullOrEmpty(Model.SearchQuery) ? $" for \"{Model.SearchQuery}\"" : "").
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
 
-                        <h5 class="movie-name-glow">@movie.Name</h5>
+            @foreach (var movie in Model.Movies)
+            {
+                <div class="col-md-3 mb-4" id="movie-@movie.Id">
 
-                        <p class="small text-white-50">
-                            @movie.ReleaseDate.Year • @movie.Status
-                        </p>
+                    <div class="card border-0 shadow-sm text-white position-relative">
 
-                        <!-- Actors -->
-                        <div class="mb-2">
-                            @if (Model.MovieActors.ContainsKey(movie.Id))
+                        <!-- IMAGE -->
+                        <img src="~/Assets/Admin/img/movie/@movie.MainImage"
+                             class="card-img"
+                             style="height:360px; object-fit:cover;" />
+
+                        <!-- OVERLAY -->
+                        <div class="card-img-overlay d-flex flex-column justify-content-end"
+                             style="background: linear-gradient(to top, rgba(0,0,0,0.65), rgba(0,0,0,0.1));">
+
+                            <!-- TITLE -->
+                            <h5 class="movie-name-glow">@movie.Name</h5>
+
+                            <p class="small text-white-50">
+                                @movie.ReleaseDate.Year • @movie.DurationMinutes min • @movie.Status
+                            </p>
+
+                            <!-- ================= IMAGES BADGE ================= -->
+                            @if (Model.MovieImages.ContainsKey(movie.Id))
                             {
-                                foreach (var actor in Model.MovieActors[movie.Id])
+                                var images = Model.MovieImages[movie.Id];
+
+                                if (images.Count > 1)
                                 {
-                                    <span class="badge bg-light text-dark">@actor</span>
+                                    <span class="badge text-bg-secondary text-white position-absolute top-0 end-0 m-2">
+                                    +@(images.Count - 1) images
+                                    </span>
                                 }
                             }
-                        </div>
 
-                        <!-- Categories -->
-                        <div class="mb-2">
-                            @if (Model.MovieCategories.ContainsKey(movie.Id))
-                            {
-                                foreach (var cat in Model.MovieCategories[movie.Id])
-                                {
-                                    <span class="badge bg-dark">@cat</span>
+                            <!-- ================= ACTORS ================= -->
+                            <div class="mb-2 d-flex flex-wrap gap-1">
+
+                                @{
+                                    var actors = Model.MovieActors.ContainsKey(movie.Id)
+                                        ? Model.MovieActors[movie.Id]
+                                        : new List<string>();
+
+                                    var visibleActors = actors.Take(3);
+                                    var hiddenActors = actors.Skip(3).ToList();
                                 }
-                            }
+
+                                @foreach (var a in visibleActors)
+                                {
+                                    <span class="badge bg-secondary text-white">@a</span>
+                                }
+
+                                @if (hiddenActors.Any())
+                                {
+                                    <span class="badge text-bg-secondary text-white"
+                                          data-bs-toggle="tooltip"
+                                          data-bs-title="@string.Join(" | ", hiddenActors)">
+                                        +@hiddenActors.Count
+                                    </span>
+                                }
+                            </div>
+
+                            <!-- ================= CATEGORIES ================= -->
+                            <div class="mb-2 d-flex flex-wrap gap-1">
+
+                                @{
+                                    var cats = Model.MovieCategories.ContainsKey(movie.Id)
+                                        ? Model.MovieCategories[movie.Id]
+                                        : new List<string>();
+
+                                    var visibleCats = cats.Take(3);
+                                    var hiddenCats = cats.Skip(3).ToList();
+                                }
+
+                                @foreach (var c in visibleCats)
+                                {
+                                    <span class="badge bg-primary text-white">@c</span>
+                                }
+
+                                @if (hiddenCats.Any())
+                                {
+                                    <span class="badge text-bg-secondary text-white"
+                                          data-bs-toggle="tooltip"
+                                          data-bs-title="@string.Join(" | ", hiddenCats)">
+                                        +@hiddenCats.Count
+                                    </span>
+                                }
+                            </div>
+
+                            <!-- ================= ACTIONS ================= -->
+                            <div class="d-flex gap-2">
+                                <a asp-action="Update"
+                                   asp-route-id="@movie.Id"
+                                   class="btn btn-sm btn-light">
+                                    Edit
+                                </a>
+
+                                <a href="#"
+                                   onclick="deleteMovie(event,@movie.Id)"
+                                   class="btn btn-sm btn-danger">
+                                    Delete
+                                </a>
+                            </div>
+
                         </div>
-
-                        <div class="d-flex gap-2">
-                            <a asp-action="Update" asp-route-id="@movie.Id"
-                               class="btn btn-sm btn-light">Edit</a>
-
-                            <a href="#"
-                               onclick="deleteMovie(event,@movie.Id)"
-                               class="btn btn-sm btn-danger">Delete</a>
-                        </div>
-
                     </div>
                 </div>
-            </div>
-        }
+            }
+        </div>
 
-    </div>
+        <!-- PAGINATION -->
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
 
-    <!-- ✅ PAGINATION -->
-    <nav class="mt-4">
-        <ul class="pagination justify-content-center">
-
-            <!-- Previous -->
-            <li class="page-item @(Model.CurrentPage <= 1 ? "disabled" : "")">
-                <a class="page-link"
-                       asp-action="Index"
-                       asp-route-page="@(Model.CurrentPage - 1)">
-                    Previous
-                </a>
-            </li>
-
-            <!-- Numbers -->
-            @for (int i = 1; i <= Model.TotalPages; i++)
-            {
-                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                <li class="page-item @(Model.CurrentPage <= 1 ? "disabled" : "")">
                     <a class="page-link"
-                           asp-action="Index"
-                           asp-route-page="@i">
-                        @i
+                       asp-action="Index"
+                       asp-route-page="@(Model.CurrentPage - 1)"
+                       asp-route-q="@Model.SearchQuery">
+                        Previous
                     </a>
                 </li>
-            }
 
-            <!-- Next -->
-            <li class="page-item @(Model.CurrentPage >= Model.TotalPages ? "disabled" : "")">
-                <a class="page-link"
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="@i"
+                           asp-route-q="@Model.SearchQuery">
+                            @i
+                        </a>
+                    </li>
+                }
+
+                <li class="page-item @(Model.CurrentPage >= Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link"
                        asp-action="Index"
-                       asp-route-page="@(Model.CurrentPage + 1)">
-                    Next
-                </a>
-            </li>
+                       asp-route-page="@(Model.CurrentPage + 1)"
+                       asp-route-q="@Model.SearchQuery">
+                        Next
+                    </a>
+                </li>
 
-        </ul>
+            </ul>
 
-        <div class="text-center text-muted mt-2">
-            Page @Model.CurrentPage of @Model.TotalPages
-        </div>
-    </nav>
+            <div class="text-center text-muted mt-2">
+                Page @Model.CurrentPage of @Model.TotalPages
+            </div>
+        </nav>
+    }
 </div>
 
+<!-- STYLE -->
 @section Styles {
     <style>
         .movie-name-glow {
-            color: White;
-            text-shadow: 0 0 5px Blue;
+            color: white;
+            text-shadow: 0 0 5px blue;
         }
     </style>
 }
 
+<!-- SCRIPTS -->
 @section Scripts {
     <script>
-        function deleteMovie(e,id){
+        function deleteMovie(e, id) {
             e.preventDefault();
 
-            if(!confirm("Delete this movie?")) return;
+            if (!confirm("Delete this movie?")) return;
 
-            fetch(`/Admin/Movie/Delete/${id}`,{
-                method:"POST"
-            })
-            .then(r=>{
-                if(r.ok) location.reload();
-            });
+            fetch(`/Admin/Movie/Delete/${id}`, { method: "POST" })
+                .then(r => {
+                    if (r.ok) {
+                        showToast("Movie deleted successfully!", "success");
+
+                        const el = document.getElementById(`movie-${id}`);
+                        if (el) el.remove();
+                    } else {
+                        showToast("Something went wrong", "error");
+                    }
+                });
         }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var tooltips = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltips.map(function (el) {
+                return new bootstrap.Tooltip(el);
+            });
+        });
     </script>
 }

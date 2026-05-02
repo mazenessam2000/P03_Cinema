@@ -1,0 +1,21 @@
+﻿@model List<Category>
+
+<li class="nav-item dropdown cv-dropdown">
+    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+        <i class="fa fa-layer-group me-1 opacity-50"></i> Categories
+    </a>
+
+    <ul class="dropdown-menu">
+        @foreach (var cat in Model)
+        {
+            <li>
+                <a class="dropdown-item"
+                       asp-controller="Movies"
+                       asp-action="ByCategory"
+                       asp-route-id="@cat.Id">
+                    @cat.Name
+                </a>
+            </li>
+        }
+    </ul>
+</li>

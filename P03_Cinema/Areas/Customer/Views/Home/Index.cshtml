@@ -1,0 +1,99 @@
+@model HomeVM
+
+@{
+    ViewData["Title"] = "Home";
+}
+
+<!-- HERO -->
+<div class="hero text-white rounded mb-5">
+    <div>
+        <h1 class="display-4 fw-bold">Welcome to CinemaVerse</h1>
+        <p class="lead">Unlimited Movies, Series & Entertainment in one place</p>
+        <a class="btn btn-danger btn-lg mt-3">Watch Now</a>
+    </div>
+</div>
+
+<!-- CATEGORIES -->
+<div class="mb-4">
+    <h4 class="mb-3">🎭 Categories</h4>
+
+    <div class="d-flex flex-wrap gap-2">
+        @foreach (var cat in Model.Categories)
+        {
+            <a asp-controller="Movies"
+                   asp-action="ByCategory"
+                   asp-route-id="@cat.Id"
+                   class="badge bg-secondary p-2 text-decoration-none">
+                @cat.Name
+            </a>
+        }
+    </div>
+</div>
+
+<!-- POPULAR MOVIES -->
+<div class="mb-5">
+    <h4 class="mb-3">🔥 Popular Movies</h4>
+
+    <div class="row g-4">
+        @foreach (var movie in Model.PopularMovies)
+        {
+            <div class="col-md-3">
+                <a asp-controller="Movies"
+                       asp-action="Details"
+                       asp-route-id="@movie.Id"
+                       class="text-decoration-none text-dark">
+
+                    <div class="card card-dark h-100">
+
+                        <img src="@Url.Content($"~/assets/admin/img/movie/{movie.MainImage}")"
+                             class="card-img-top"
+                             style="height: 350px; object-fit: cover;" />
+
+                        <div class="card-body">
+                            <h6>@movie.Name</h6>
+
+                            <small>
+                                @string.Join(", ", movie.Categories)
+                            </small>
+                        </div>
+
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- TRENDING MOVIES -->
+<div class="mb-5">
+    <h4 class="mb-3">🚀 Trending Movies</h4>
+
+    <div class="row g-4">
+        @foreach (var movie in Model.TrendingMovies)
+        {
+            <div class="col-md-3">
+                <a asp-controller="Movies"
+                       asp-action="Details"
+                       asp-route-id="@movie.Id"
+                       class="text-decoration-none text-dark">
+
+                    <div class="card card-dark h-100">
+
+                        <img src="@Url.Content($"~/assets/admin/img/movie/{movie.MainImage}")"
+                             class="card-img-top"
+                             style="height: 350px; object-fit: cover;" />
+
+                        <div class="card-body">
+                            <h6>@movie.Name</h6>
+
+                            <small>
+                                @string.Join(", ", movie.Categories)
+                            </small>
+                        </div>
+
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+</div>

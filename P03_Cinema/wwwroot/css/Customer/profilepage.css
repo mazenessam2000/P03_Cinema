@@ -1,0 +1,185 @@
+/* ── PROFILE ───────────────────────────────────────────────────────── */
+.cv-profile-wrap {
+    max-width: 520px;
+    margin: 50px auto;
+}
+
+.cv-surface {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+    transition: 0.25s;
+}
+
+    .cv-surface:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+    }
+
+/* Banner — FIX: flex centering replaces the old position hacks */
+.cv-profile-banner {
+    height: 150px;
+    background: linear-gradient(120deg, #e50914, #2a0000);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 0;
+}
+
+/* Avatar — FIX: remove old left:40% hack, use negative margin to overlap */
+.cv-avatar-ring {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    border: 3px solid var(--red);
+    padding: 3px;
+    background: var(--surface);
+    position: relative;
+    left: unset;
+    margin-bottom: -48px;
+    box-shadow: 0 0 20px rgba(229,9,20,0.4);
+}
+
+    .cv-avatar-ring img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+/* Member badge — FIX: remove old hardcoded margin-left: 27.5% */
+.cv-member-badge {
+    margin-top: 56px;
+    margin-left: 0;
+    text-align: center;
+    color: var(--yellow);
+    font-size: 18px;
+    padding-bottom: 8px;
+}
+
+    .cv-member-badge:hover {
+        text-shadow: 0 0 5px var(--yellow);
+    }
+
+/* Profile meta block */
+.cv-profile-meta {
+    text-align: center;
+    padding-top: 8px;
+}
+
+/* Name — FIX: remove old margin-left: 20px, center it properly */
+.cv-profile-name {
+    font-size: 24px;
+    margin-top: 10px;
+    margin-left: 0;
+    text-align: center;
+    background: linear-gradient(90deg, #fff, #bbb);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+/* Stats — FIX: flex row centered instead of ms-4 offset */
+.cv-profile-stats {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin: 12px 0 !important;
+}
+
+.cv-stat-value {
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+/* Divider */
+.cv-divider {
+    height: 1px;
+    margin: 20px;
+    background: linear-gradient(to right, transparent, rgba(229,9,20,.4), transparent);
+    border: none;
+}
+
+/* Info grid */
+.cv-info-grid {
+    padding: 0 20px 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.cv-info-cell {
+    background: linear-gradient(145deg, #1a1a1a, #141414);
+    border: 1px solid var(--border);
+    border-left: 3px solid rgba(229,9,20,0.4);
+    border-radius: var(--radius);
+    padding: 14px;
+    transition: 0.25s;
+}
+
+    .cv-info-cell:hover {
+        border-left-color: var(--red);
+        transform: translateX(4px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+
+    .cv-info-cell .label,
+    .cv-info-cell .cell-label {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+    }
+
+    .cv-info-cell .value,
+    .cv-info-cell .cell-value {
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+/* Buttons */
+.cv-profile-actions {
+    padding: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.cv-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: 0.25s;
+}
+
+.cv-btn-primary {
+    background: var(--red);
+    color: #fff !important;
+    border: none;
+    box-shadow: 0 6px 25px rgba(229,9,20,0.35);
+}
+
+    .cv-btn-primary:hover {
+        box-shadow: 0 10px 35px rgba(229,9,20,0.6);
+        color: #fff !important;
+    }
+
+.cv-btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+}
+
+    .cv-btn-outline:hover {
+        border-color: var(--red);
+        color: var(--red);
+    }

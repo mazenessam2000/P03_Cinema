@@ -1,0 +1,68 @@
+﻿@{
+    var success = TempData["Success"] as string;
+    var error = TempData["Error"] as string;
+    var warning = TempData["Warning"] as string;
+    var info = TempData["Info"] as string;
+}
+
+<script>
+    function showToast(message, type = "success") {
+
+        let bgClass = "alert-success";
+        let icon = "fa-check-circle";
+
+        if (type === "error") {
+            bgClass = "alert-danger";
+            icon = "fa-times-circle";
+        }
+        else if (type === "warning") {
+            bgClass = "alert-warning";
+            icon = "fa-exclamation-triangle";
+        }
+        else if (type === "info") {
+            bgClass = "alert-primary";
+            icon = "fa-info-circle";
+        }
+
+        const toast = document.createElement('div');
+        toast.className = `position-fixed top-0 end-0 m-3 alert ${bgClass} d-flex align-items-center shadow`;
+        toast.style.zIndex = 9999;
+        toast.style.minWidth = '280px';
+        toast.style.opacity = "1";
+        toast.style.transition = "opacity 0.5s";
+
+        toast.innerHTML = `<span class="fas ${icon} me-2"></span>${message}`;
+
+        document.body.appendChild(toast);
+
+        // fade out
+        setTimeout(() => {
+            toast.style.opacity = "0";
+            setTimeout(() => toast.remove(), 500);
+        }, 2500);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        @if (success != null)
+        {
+                <text>showToast("@success", "success");</text>
+        }
+
+        @if (error != null)
+        {
+                <text>showToast("@error", "error");</text>
+        }
+
+        @if (warning != null)
+        {
+                <text>showToast("@warning", "warning");</text>
+        }
+
+        @if (info != null)
+        {
+                <text>showToast("@info", "info");</text>
+        }
+
+    });
+</script>

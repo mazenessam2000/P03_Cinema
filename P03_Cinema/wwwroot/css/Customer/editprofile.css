@@ -1,0 +1,134 @@
+.cv-page-wrap-md {
+    max-width: 600px;
+    margin: 60px auto;
+}
+
+.cv-animate {
+    animation: fadeUp 0.4s ease;
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* HEADER */
+.cv-page-header-inline {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+/* SECTIONS */
+.cv-section-divider {
+    font-size: 34px;
+    color: var(--text-muted);
+    margin: 18px 0 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid var(--border);
+}
+
+/* FORM */
+.cv-field-group {
+    margin-bottom: 14px;
+}
+
+.cv-label {
+    font-size: 13px;
+    margin-bottom: 6px;
+    display: block;
+    color: var(--text-muted);
+}
+
+/* COLLAPSE */
+.cv-collapse-toggle {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+}
+
+
+.cv-collapsible {
+    margin-top: 10px;
+    display: none;
+}
+
+    .cv-collapsible.open {
+        display: block;
+    }
+
+/* INPUT STRENGTH */
+.cv-strength-bar {
+    height: 5px;
+    background: #222;
+    border-radius: 10px;
+    margin-top: 6px;
+    overflow: hidden;
+}
+
+.cv-strength-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--red);
+    transition: 0.3s;
+}
+
+.cv-strength-hint {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+/* BUTTONS */
+.cv-btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ── USER PILL ────────────────────────────────────────────────────── */
+.cv-user-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 30px;
+    padding: 5px 14px 5px 6px;
+    color: #f0f0f0;
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+    user-select: none;
+}
+
+    .cv-user-pill:hover {
+        background: rgba(255,255,255,0.1);
+        border-color: rgba(255,255,255,0.2);
+    }
+
+    /* hide Bootstrap's default caret arrow */
+    .cv-user-pill::after {
+        display: none;
+    }
