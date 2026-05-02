@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace P03_Cinema.Areas.Admin.Controllers;
 
 [Area(SD.ADMIN_AREA)]
+[Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
 public class CinemaController(ICinemaService cinemaService) : Controller
 {
     private readonly ICinemaService _cinemaService = cinemaService;

@@ -24,6 +24,13 @@
         </div>
 
         <div class="mb-3">
+            <label>Hall</label>
+            <select asp-for="HallId"
+                    asp-items="@(new SelectList(Model.Halls, "Id", "Name", Model.HallId))"
+                    class="form-select"></select>
+        </div>
+
+        <div class="mb-3">
             <label asp-for="StartTime"></label>
             <input asp-for="StartTime" type="datetime-local" class="form-control" />
         </div>

@@ -1,96 +1,93 @@
 ﻿@model ShowTimeCreateVM
 
-<div class="container py-4">
-    <h2 class="mb-4">🎬 Create ShowTime</h2>
+<div class="container py-4" style="max-width:600px;">
 
-    <div class="card shadow-sm border-0">
+    <div class="d-flex align-items-center gap-2 mb-4">
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">← Back</a>
+        <h4 class="mb-0">Create ShowTime</h4>
+    </div>
+
+    <div class="card border-0 shadow-sm">
         <div class="card-body">
-
             <form asp-action="Create" method="post">
 
-                <div asp-validation-summary="All" class="text-danger mb-3"></div>
+                <div asp-validation-summary="All" class="alert alert-danger mb-3"></div>
 
                 <!-- Movie -->
                 <div class="mb-3">
-                    <label class="form-label">Movie</label>
+                    <label class="form-label fw-semibold">Movie</label>
                     <select asp-for="MovieId"
                             asp-items="@(new SelectList(Model.Movies, "Id", "Name"))"
                             class="form-select">
+                        <option value="">— Select Movie —</option>
                     </select>
+                    <span asp-validation-for="MovieId" class="text-danger small"></span>
                 </div>
 
                 <!-- Cinema -->
                 <div class="mb-3">
-                    <label class="form-label">Cinema</label>
-                    <select id="cinemaSelect"
-                            asp-for="CinemaId"
+                    <label class="form-label fw-semibold">Cinema</label>
+                    <select asp-for="CinemaId" id="cinemaSelect"
                             asp-items="@(new SelectList(Model.Cinemas, "Id", "Name"))"
                             class="form-select">
+                        <option value="">— Select Cinema —</option>
                     </select>
+                    <span asp-validation-for="CinemaId" class="text-danger small"></span>
                 </div>
 
-                <!-- Hall -->
+                <!-- Hall (loaded dynamically) -->
                 <div class="mb-3">
-                    <label class="form-label">Hall</label>
-                    <select id="hallSelect"
-                            asp-for="HallId"
-                            class="form-select">
-                        <option value="">-- Select Hall --</option>
+                    <label class="form-label fw-semibold">Hall</label>
+                    <select asp-for="HallId" id="hallSelect" class="form-select">
+                        <option value="">— Select Cinema First —</option>
                     </select>
+                    <span asp-validation-for="HallId" class="text-danger small"></span>
                 </div>
 
                 <!-- Start Time -->
-                <div class="mb-3">
-                    <label asp-for="StartTime" class="form-label"></label>
+                <div class="mb-4">
+                    <label asp-for="StartTime" class="form-label fw-semibold"></label>
                     <input asp-for="StartTime" type="datetime-local" class="form-control" />
+                    <span asp-validation-for="StartTime" class="text-danger small"></span>
                 </div>
 
-                <div class="d-flex justify-content-between">
-                    <a asp-action="Index" class="btn btn-outline-dark">← Back</a>
-                    <button class="btn btn-primary">Create</button>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Create ShowTime</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
                 </div>
 
             </form>
-
         </div>
     </div>
+
 </div>
 
 @section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const cinemaSelect = document.getElementById("cinemaSelect");
-            const hallSelect = document.getElementById("hallSelect");
+        const cinemaSelect = document.getElementById('cinemaSelect');
+        const hallSelect = document.getElementById('hallSelect');
 
-            function loadHalls(cinemaId) {
-                if (!cinemaId) {
-                    hallSelect.innerHTML = '<option value="">-- Select Hall --</option>';
-                    return;
-                }
+        cinemaSelect.addEventListener('change', async () => {
+            const cinemaId = cinemaSelect.value;
+            hallSelect.innerHTML = '<option value="">Loading...</option>';
 
-                hallSelect.innerHTML = '<option>Loading...</option>';
-
-                fetch(`/Admin/Hall/GetByCinema?cinemaId=${cinemaId}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        hallSelect.innerHTML = '<option value="">-- Select Hall --</option>';
-
-                        data.forEach(h => {
-                            hallSelect.innerHTML += `<option value="${h.id}">${h.name}</option>`;
-                        });
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        hallSelect.innerHTML = '<option>Error loading halls</option>';
-                    });
+            if (!cinemaId) {
+                hallSelect.innerHTML = '<option value="">— Select Cinema First —</option>';
+                return;
             }
 
-            // 🔥 1. Load immediately on page load
-            loadHalls(cinemaSelect.value);
+            const res = await fetch(`/Admin/Hall/GetByCinema?cinemaId=${cinemaId}`);
+            const halls = await res.json();
 
-            // 🔥 2. Reload when cinema changes
-            cinemaSelect.addEventListener("change", function () {
-                loadHalls(this.value);
+            hallSelect.innerHTML = '<option value="">— Select Hall —</option>';
+            halls.forEach(h => {
+                const opt = document.createElement('option');
+                opt.value = h.id;
+                opt.textContent = h.name;
+                hallSelect.appendChild(opt);
             });
         });
     </script>

@@ -158,9 +158,21 @@ public class ShowTimeService : IShowTimeService
             Id = show.Id,
             MovieId = show.MovieId,
             CinemaId = show.CinemaId,
+            HallId = show.HallId, // ✅ REQUIRED
             StartTime = show.StartTime,
-            Movies = await _movieRepo.Get().AsNoTracking().ToListAsync(ct),
-            Cinemas = await _cinemaRepo.Get().AsNoTracking().ToListAsync(ct)
+
+            Movies = await _movieRepo.Get()
+                .AsNoTracking()
+                .ToListAsync(ct),
+
+            Cinemas = await _cinemaRepo.Get()
+                .AsNoTracking()
+                .ToListAsync(ct),
+
+            Halls = await _hallRepo.Get()
+                .Where(h => h.CinemaId == show.CinemaId)
+                .AsNoTracking()
+                .ToListAsync(ct)
         };
     }
 
@@ -172,6 +184,7 @@ public class ShowTimeService : IShowTimeService
         if (show == null)
             throw new KeyNotFoundException("ShowTime not found");
 
+        // Prevent duplicate exact showtime
         var exists = await _showTimeRepo.Get()
             .AnyAsync(x =>
                 x.Id != vm.Id &&
@@ -182,30 +195,45 @@ public class ShowTimeService : IShowTimeService
         if (exists)
             throw new InvalidOperationException("This showtime already exists");
 
+        // Validate movie
         var movie = await _movieRepo.GetByIdAsync(vm.MovieId, ct)
             ?? throw new KeyNotFoundException("Movie not found");
+
+        // Validate cinema
+        var cinema = await _cinemaRepo.GetByIdAsync(vm.CinemaId, ct)
+            ?? throw new KeyNotFoundException("Cinema not found");
+
+        // ✅ Validate hall (this fixes your FK error)
+        var hall = await _hallRepo.Get()
+            .FirstOrDefaultAsync(h => h.Id == vm.HallId && h.CinemaId == vm.CinemaId, ct)
+            ?? throw new InvalidOperationException("Invalid hall for this cinema");
 
         var newStart = vm.StartTime;
         var newEnd = vm.StartTime.AddMinutes(movie.DurationMinutes);
 
-        var overlaps = await _showTimeRepo.Get()
+        // ✅ Safer overlap check (avoid EF translation issues)
+        var showtimes = await _showTimeRepo.Get()
             .Where(x => x.CinemaId == vm.CinemaId && x.Id != vm.Id)
             .Include(x => x.Movie)
-            .AnyAsync(x =>
-                newStart < x.StartTime.AddMinutes(x.Movie.DurationMinutes) &&
-                newEnd > x.StartTime, ct);
+            .ToListAsync(ct);
+
+        var overlaps = showtimes.Any(x =>
+        {
+            var existingEnd = x.StartTime.AddMinutes(x.Movie.DurationMinutes);
+            return newStart < existingEnd && newEnd > x.StartTime;
+        });
 
         if (overlaps)
             throw new InvalidOperationException("This showtime overlaps with another showtime in the same cinema");
 
-        var cinema = await _cinemaRepo.GetByIdAsync(vm.CinemaId, ct)
-            ?? throw new KeyNotFoundException("Cinema not found");
-
+        // ✅ Update
         show.MovieId = vm.MovieId;
         show.CinemaId = vm.CinemaId;
         show.HallId = vm.HallId;
         show.StartTime = vm.StartTime;
-        show.AvailableSeats = cinema.TotalSeats;
+
+        // ✅ FIX: use hall capacity, not cinema
+        show.AvailableSeats = hall.TotalSeats;
 
         await _unitOfWork.SaveChangesAsync(ct);
     }

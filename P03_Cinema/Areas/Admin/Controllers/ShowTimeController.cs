@@ -1,11 +1,21 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace P03_Cinema.Areas.Admin.Controllers;
 
 [Area(SD.ADMIN_AREA)]
-public class ShowTimeController(IShowTimeService showTimeService) : Controller
+[Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
+
+public class ShowTimeController(IShowTimeService showTimeService,
+    IRepository<Movie> movieRepo,
+    IRepository<Cinema> cinemaRepo,
+    IRepository<Hall> hallRepo) : Controller
 {
     private readonly IShowTimeService _showTimeService = showTimeService;
+    private readonly IRepository<Movie> _movieRepo = movieRepo;
+    private readonly IRepository<Cinema> _cinemaRepo = cinemaRepo;
+    private readonly IRepository<Hall> _hallRepo = hallRepo;
     private const int PageSize = 12;
 
     public async Task<IActionResult> Index(int page = 1, string q = "", CancellationToken ct = default)
@@ -52,9 +62,7 @@ public class ShowTimeController(IShowTimeService showTimeService) : Controller
     {
         if (!ModelState.IsValid)
         {
-            var newVm = await _showTimeService.GetCreateVMAsync(ct);
-            vm.Movies = newVm.Movies;
-            vm.Cinemas = newVm.Cinemas;
+            await PopulateDropdowns(vm, ct);
             return View(vm);
         }
 
@@ -68,10 +76,7 @@ public class ShowTimeController(IShowTimeService showTimeService) : Controller
         {
             ModelState.AddModelError("", ex.Message);
 
-            var newVm = await _showTimeService.GetCreateVMAsync(ct);
-            vm.Movies = newVm.Movies;
-            vm.Cinemas = newVm.Cinemas;
-
+            await PopulateDropdowns(vm, ct);
             return View(vm);
         }
     }
@@ -88,5 +93,15 @@ public class ShowTimeController(IShowTimeService showTimeService) : Controller
         {
             return NotFound();
         }
+    }
+
+    private async Task PopulateDropdowns(ShowTimeUpdateVM vm, CancellationToken ct)
+    {
+        vm.Movies = await _movieRepo.Get().ToListAsync(ct);
+        vm.Cinemas = await _cinemaRepo.Get().ToListAsync(ct);
+
+        vm.Halls = await _hallRepo.Get()
+            .Where(h => h.CinemaId == vm.CinemaId)
+            .ToListAsync(ct);
     }
 }
