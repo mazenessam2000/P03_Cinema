@@ -1,8 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace P03_Cinema.Areas.Admin.Controllers;
 
 [Area(SD.ADMIN_AREA)]
+[Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
+
 public class HallController(IHallService hallService) : Controller
 {
     private readonly IHallService _hallService = hallService;
