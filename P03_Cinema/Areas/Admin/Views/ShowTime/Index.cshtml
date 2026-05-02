@@ -32,52 +32,66 @@
     {
         <div class="row g-4">
 
-            @foreach (var s in Model.ShowTimes)
+            @foreach (var s in Model.ShowTimes ?? Enumerable.Empty<ShowTime>())
             {
-                <div class="col-md-3" id="show-@s.Id">
+                if (s?.Movie == null || s?.Cinema == null || s?.Hall == null)
+                {
+                    continue;
+                }
 
-                    <div class="card shadow-sm border-0 h-100">
+                var isPast = s.StartTime < DateTime.UtcNow;
 
-                        <!-- 🎬 MOVIE IMAGE -->
-                        <img src="~/Assets/Admin/img/movie/@s.Movie.MainImage"
-                             class="card-img-top"
-                             style="height:140px; object-fit:cover;" />
+                <div class="col-md-4" id="show-@s.Id">
+                    <div class="card border-0 shadow-sm text-white">
 
-                        <div class="card-body">
+                        <img src="~/Assets/Admin/img/movie/@(s.Movie?.MainImage ?? "default.jpg")"
+                             class="card-img"
+                             style="height:220px; object-fit:cover;" />
 
-                            <h5 class="mb-1">@s.Movie.Name</h5>
+                        <div class="card-img-overlay d-flex flex-column justify-content-end"
+                             style="background: linear-gradient(to top, rgba(0,0,0,.7), transparent);">
 
-                            <p class="text-muted small mb-2">
-                                @s.Cinema.Name
-                            </p>
+                            <h5>@s.Movie.Name</h5>
 
-                            <p class="mb-1">
-                                <strong>Time:</strong><br />
-                                @s.StartTime.ToString("yyyy-MM-dd HH:mm")
-                            </p>
+                            <div class="small text-white-50 mb-2">
+                                🏛 @s.Cinema.Name <br />
+                                🎭 @s.Hall.Name
+                            </div>
 
-                            <p class="mb-3">
-                                <strong>Seats:</strong> @s.AvailableSeats
-                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
 
-                            <div class="d-flex gap-2">
-                                <a asp-action="Update"
+                                <div>
+                                    <div class="fw-semibold">
+                                        🕐 @s.StartTime.ToString("ddd dd MMM, h:mm tt")
+                                    </div>
+
+                                    @if (isPast)
+                                    {
+                                        <span class="badge bg-danger mt-1">Expired</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success mt-1">Upcoming</span>
+                                    }
+                                </div>
+
+                                <div class="d-flex gap-2">
+                                    <a asp-action="Update"
                                        asp-route-id="@s.Id"
-                                       class="btn btn-sm btn-light">
-                                    Edit
-                                </a>
+                                       class="btn btn-sm btn-outline-warning">✏️</a>
 
-                                <button class="btn btn-sm btn-danger"
-                                        onclick="deleteShowTime(@s.Id)">
-                                    Delete
-                                </button>
+                                    <button class="btn btn-sm btn-outline-danger"
+                                            onclick="deleteShowTime(@s.Id)">
+                                        🗑
+                                    </button>
+                                </div>
+
                             </div>
 
                         </div>
                     </div>
                 </div>
             }
-
         </div>
 
         <!-- 🔢 PAGINATION -->

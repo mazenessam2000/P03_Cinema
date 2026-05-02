@@ -7,3 +7,4 @@ global using P03_Cinema.Interfaces.Repositories;
 global using P03_Cinema.Interfaces.Services;
 global using P03_Cinema.Repositories;
 global using P03_Cinema.Utility.Enums;
+global using P03_Cinema.Utility.DbInitializers;

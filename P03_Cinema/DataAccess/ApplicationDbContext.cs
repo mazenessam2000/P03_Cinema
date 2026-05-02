@@ -20,11 +20,17 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<MovieCategory> MovieCategories { get; set; }
     public DbSet<ShowTime> ShowTimes { get; set; }
     public DbSet<ApplicationUserOTP> ApplicationUserOTPs { get; set; }
+    public DbSet<Booking> Bookings { get; set; }
+    public DbSet<Hall> Halls { get; set; }
+    public DbSet<Seat> Seats { get; set; }
+    public DbSet<ShowTimeSeat> ShowTimeSeats { get; set; }
+    public DbSet<Cart> Carts { get; set; }
+    public DbSet<CartItem> CartItems { get; set; }
+    public DbSet<BookingSeat> BookingSeats { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ActorConfiguration).Assembly);
     }
 }

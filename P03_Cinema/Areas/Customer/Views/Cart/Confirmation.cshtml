@@ -1,0 +1,44 @@
+@model BookingConfirmationVM
+
+<div class="container py-5" style="max-width:600px;">
+
+    <div class="text-center mb-5">
+        <div class="fs-1 mb-2">🎉</div>
+        <h3 class="fw-bold">Booking Confirmed!</h3>
+        <p class="text-muted">Booking #@Model.BookingId · @Model.BookingDate.ToString("dd MMM yyyy, h:mm tt")</p>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-5">Movie</dt>
+                <dd class="col-7">@Model.MovieName</dd>
+
+                <dt class="col-5">Cinema</dt>
+                <dd class="col-7">@Model.CinemaName</dd>
+
+                <dt class="col-5">Hall</dt>
+                <dd class="col-7">@Model.HallName</dd>
+
+                <dt class="col-5">Showtime</dt>
+                <dd class="col-7">@Model.ShowTime.ToString("ddd dd MMM yyyy, h:mm tt")</dd>
+
+                <dt class="col-5">Your Seats</dt>
+                <dd class="col-7">
+                    @foreach (var seat in Model.SeatLabels)
+                    {
+                        <span class="badge bg-primary me-1">@seat</span>
+                    }
+                </dd>
+
+                <dt class="col-5">Total Paid</dt>
+                <dd class="col-7 fw-bold text-success fs-5">$@Model.TotalPaid</dd>
+            </dl>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 justify-content-center">
+        <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Browse More Movies</a>
+    </div>
+
+</div>

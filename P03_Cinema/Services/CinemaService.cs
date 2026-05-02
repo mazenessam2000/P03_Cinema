@@ -17,7 +17,7 @@ public class CinemaService(
 
     public async Task<CinemaIndexVM> GetCinemasPageAsync(int page, int pageSize, string q = "", CancellationToken ct = default)
     {
-        var query = _cinemaRepo.Get().AsQueryable();
+        var query = _cinemaRepo.Get();
 
         if (!string.IsNullOrWhiteSpace(q))
             query = query.Where(x => x.Name.Contains(q) || x.Location.Contains(q));
@@ -47,7 +47,6 @@ public class CinemaService(
             SearchQuery = q
         };
     }
-
 
     public async Task<CinemaCreateVM> GetCreateVMAsync(CancellationToken ct)
     {
@@ -106,7 +105,6 @@ public class CinemaService(
         cinema.Name = vm.Cinema.Name;
         cinema.Location = vm.Cinema.Location;
         cinema.IsActive = vm.Cinema.IsActive;
-        cinema.TotalSeats = vm.Cinema.TotalSeats;
 
         if (vm.Img != null)
         {
@@ -126,12 +124,6 @@ public class CinemaService(
     {
         var cinema = await _cinemaRepo.GetByIdAsync(id, ct)
             ?? throw new KeyNotFoundException($"Cinema {id} not found");
-
-        var relations = await _showTimeRepo.Get()
-            .Where(x => x.CinemaId == id)
-            .ToListAsync(ct);
-
-        _showTimeRepo.RemoveRange(relations);
 
         if (!string.IsNullOrEmpty(cinema.ImageUrl))
             _fileService.Delete(cinema.ImageUrl, FileType.Cinema);

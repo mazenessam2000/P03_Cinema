@@ -1,36 +1,97 @@
 ﻿@model ShowTimeCreateVM
 
 <div class="container py-4">
-    <h2>Create ShowTime</h2>
+    <h2 class="mb-4">🎬 Create ShowTime</h2>
 
-    <form asp-action="Create" method="post">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
 
-        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+            <form asp-action="Create" method="post">
 
-        <!-- Movie -->
-        <div class="mb-3">
-            <label class="form-label">Movie</label>
-            <select asp-for="MovieId"
-                    asp-items="@(new SelectList(Model.Movies, "Id", "Name"))"
-                    class="form-select">
-            </select>
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                <!-- Movie -->
+                <div class="mb-3">
+                    <label class="form-label">Movie</label>
+                    <select asp-for="MovieId"
+                            asp-items="@(new SelectList(Model.Movies, "Id", "Name"))"
+                            class="form-select">
+                    </select>
+                </div>
+
+                <!-- Cinema -->
+                <div class="mb-3">
+                    <label class="form-label">Cinema</label>
+                    <select id="cinemaSelect"
+                            asp-for="CinemaId"
+                            asp-items="@(new SelectList(Model.Cinemas, "Id", "Name"))"
+                            class="form-select">
+                    </select>
+                </div>
+
+                <!-- Hall -->
+                <div class="mb-3">
+                    <label class="form-label">Hall</label>
+                    <select id="hallSelect"
+                            asp-for="HallId"
+                            class="form-select">
+                        <option value="">-- Select Hall --</option>
+                    </select>
+                </div>
+
+                <!-- Start Time -->
+                <div class="mb-3">
+                    <label asp-for="StartTime" class="form-label"></label>
+                    <input asp-for="StartTime" type="datetime-local" class="form-control" />
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-outline-dark">← Back</a>
+                    <button class="btn btn-primary">Create</button>
+                </div>
+
+            </form>
+
         </div>
-
-        <!-- Cinema -->
-        <div class="mb-3">
-            <label class="form-label">Cinema</label>
-            <select asp-for="CinemaId"
-                    asp-items="@(new SelectList(Model.Cinemas, "Id", "Name"))"
-                    class="form-select">
-            </select>
-        </div>
-
-        <!-- Start Time -->
-        <div class="mb-3">
-            <label asp-for="StartTime" class="form-label"></label>
-            <input asp-for="StartTime" type="datetime-local" class="form-control" />
-        </div>
-
-        <button class="btn btn-primary">Create</button>
-    </form>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const cinemaSelect = document.getElementById("cinemaSelect");
+            const hallSelect = document.getElementById("hallSelect");
+
+            function loadHalls(cinemaId) {
+                if (!cinemaId) {
+                    hallSelect.innerHTML = '<option value="">-- Select Hall --</option>';
+                    return;
+                }
+
+                hallSelect.innerHTML = '<option>Loading...</option>';
+
+                fetch(`/Admin/Hall/GetByCinema?cinemaId=${cinemaId}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        hallSelect.innerHTML = '<option value="">-- Select Hall --</option>';
+
+                        data.forEach(h => {
+                            hallSelect.innerHTML += `<option value="${h.id}">${h.name}</option>`;
+                        });
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        hallSelect.innerHTML = '<option>Error loading halls</option>';
+                    });
+            }
+
+            // 🔥 1. Load immediately on page load
+            loadHalls(cinemaSelect.value);
+
+            // 🔥 2. Reload when cinema changes
+            cinemaSelect.addEventListener("change", function () {
+                loadHalls(this.value);
+            });
+        });
+    </script>
+}

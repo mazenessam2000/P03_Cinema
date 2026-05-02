@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace P03_Cinema.DataAccess.Configurations;
@@ -9,19 +9,24 @@ public class ShowTimeConfiguration : IEntityTypeConfiguration<ShowTime>
     {
         builder.HasKey(st => st.Id);
 
-        // ================= MOVIE =================
         builder.HasOne(st => st.Movie)
             .WithMany(m => m.ShowTimes)
             .HasForeignKey(st => st.MovieId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
-        // ================= CINEMA =================
         builder.HasOne(st => st.Cinema)
             .WithMany(c => c.ShowTimes)
             .HasForeignKey(st => st.CinemaId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasIndex(x => new { x.MovieId, x.CinemaId, x.StartTime })
-       .IsUnique();
+        builder.HasOne(st => st.Hall)
+            .WithMany(h => h.ShowTimes)
+            .HasForeignKey(st => st.HallId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasMany(st => st.ShowTimeSeats)
+            .WithOne(ss => ss.ShowTime)
+            .HasForeignKey(ss => ss.ShowTimeId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

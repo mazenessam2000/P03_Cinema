@@ -7,17 +7,26 @@ public class ShowTimeService : IShowTimeService
     private readonly IRepository<ShowTime> _showTimeRepo;
     private readonly IRepository<Cinema> _cinemaRepo;
     private readonly IRepository<Movie> _movieRepo;
+    private readonly IRepository<Seat> _seatRepo;
+    private readonly IRepository<ShowTimeSeat> _showTimeSeatRepo;
+    private readonly IRepository<Hall> _hallRepo;
     private readonly IUnitOfWork _unitOfWork;
 
     public ShowTimeService(
         IRepository<ShowTime> showTimeRepo,
         IRepository<Cinema> cinemaRepo,
         IRepository<Movie> movieRepo,
+        IRepository<ShowTimeSeat> showTimeSeatRepo,
+        IRepository<Seat> seatRepo,
+        IRepository<Hall> hallRepo,
         IUnitOfWork unitOfWork)
     {
         _showTimeRepo = showTimeRepo;
         _cinemaRepo = cinemaRepo;
         _movieRepo = movieRepo;
+        _showTimeSeatRepo = showTimeSeatRepo;
+        _seatRepo = seatRepo;
+        _hallRepo = hallRepo;
         _unitOfWork = unitOfWork;
     }
 
@@ -27,9 +36,10 @@ public class ShowTimeService : IShowTimeService
         var query = _showTimeRepo.Get()
             .Include(x => x.Movie)
             .Include(x => x.Cinema)
+            .Include(x => x.Hall)
+            .AsNoTracking()
             .AsQueryable();
 
-        // 🔍 SEARCH (by movie or cinema)
         if (!string.IsNullOrWhiteSpace(q))
         {
             query = query.Where(x =>
@@ -37,16 +47,14 @@ public class ShowTimeService : IShowTimeService
                 x.Cinema.Name.Contains(q));
         }
 
-        int total = await query.CountAsync(ct);
-        int totalPages = Math.Max(1, (int)Math.Ceiling(total / (double)pageSize));
-
+        var total = await query.CountAsync(ct);
+        var totalPages = Math.Max(1, (int)Math.Ceiling(total / (double)pageSize));
         page = Math.Clamp(page, 1, totalPages);
 
         var data = await query
             .OrderByDescending(x => x.StartTime)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .AsNoTracking()
             .ToListAsync(ct);
 
         return new ShowTimeIndexVM
@@ -64,20 +72,24 @@ public class ShowTimeService : IShowTimeService
         return new ShowTimeCreateVM
         {
             Movies = await _movieRepo.Get().AsNoTracking().ToListAsync(ct),
-            Cinemas = await _cinemaRepo.Get().AsNoTracking().ToListAsync(ct)
+            Cinemas = await _cinemaRepo.Get().AsNoTracking().ToListAsync(ct),
+            Halls = await _hallRepo.Get().AsNoTracking().ToListAsync(ct)
         };
     }
 
     public async Task CreateAsync(ShowTimeCreateVM vm, CancellationToken ct = default)
     {
         var movie = await _movieRepo.GetByIdAsync(vm.MovieId, ct)
-    ?? throw new KeyNotFoundException("Movie not found");
+            ?? throw new KeyNotFoundException("Movie not found");
 
         var cinema = await _cinemaRepo.GetByIdAsync(vm.CinemaId, ct)
             ?? throw new KeyNotFoundException("Cinema not found");
 
         var newStart = vm.StartTime;
         var newEnd = vm.StartTime.AddMinutes(movie.DurationMinutes);
+
+        if (vm.StartTime < DateTime.UtcNow)
+            throw new InvalidOperationException("Cannot create a showtime in the past.");
 
         // duplicate exact match
         var exists = await _showTimeRepo.Get()
@@ -89,9 +101,10 @@ public class ShowTimeService : IShowTimeService
         if (exists)
             throw new InvalidOperationException("This showtime already exists");
 
-        // overlap check (FIXED)
+        // FIX: Include Movie so DurationMinutes is available in the overlap query
         var overlaps = await _showTimeRepo.Get()
-            .Where(x => x.CinemaId == vm.CinemaId)
+            .Where(x => x.CinemaId == vm.CinemaId && x.HallId == vm.HallId)
+            .Include(x => x.Movie)
             .AnyAsync(x =>
                 newStart < x.StartTime.AddMinutes(x.Movie.DurationMinutes) &&
                 newEnd > x.StartTime, ct);
@@ -100,16 +113,33 @@ public class ShowTimeService : IShowTimeService
             throw new InvalidOperationException(
                 "This showtime overlaps with another showtime in the same cinema");
 
-        // create
+        var hall = await _hallRepo.GetByIdAsync(vm.HallId, ct)
+            ?? throw new KeyNotFoundException("Hall not found");
+
         var showTime = new ShowTime
         {
             MovieId = vm.MovieId,
             CinemaId = vm.CinemaId,
+            HallId = vm.HallId,
             StartTime = vm.StartTime,
             AvailableSeats = cinema.TotalSeats
         };
 
+
         await _showTimeRepo.AddAsync(showTime, ct);
+
+        var hallSeats = await _seatRepo.Get()
+            .Where(s => s.HallId == vm.HallId)
+            .ToListAsync(ct);
+
+        var showTimeSeats = hallSeats.Select(s => new ShowTimeSeat
+        {
+            ShowTime = showTime,
+            SeatId = s.Id
+        });
+
+        await _showTimeSeatRepo.AddRangeAsync(showTimeSeats, ct);
+
         await _unitOfWork.SaveChangesAsync(ct);
     }
 
@@ -142,7 +172,6 @@ public class ShowTimeService : IShowTimeService
         if (show == null)
             throw new KeyNotFoundException("ShowTime not found");
 
-        // 🔴 DUPLICATE CHECK (exclude itself)
         var exists = await _showTimeRepo.Get()
             .AnyAsync(x =>
                 x.Id != vm.Id &&
@@ -153,14 +182,12 @@ public class ShowTimeService : IShowTimeService
         if (exists)
             throw new InvalidOperationException("This showtime already exists");
 
-        // 🔴 GET MOVIE
         var movie = await _movieRepo.GetByIdAsync(vm.MovieId, ct)
             ?? throw new KeyNotFoundException("Movie not found");
 
         var newStart = vm.StartTime;
         var newEnd = vm.StartTime.AddMinutes(movie.DurationMinutes);
 
-        // 🔴 OVERLAP CHECK (exclude itself)
         var overlaps = await _showTimeRepo.Get()
             .Where(x => x.CinemaId == vm.CinemaId && x.Id != vm.Id)
             .Include(x => x.Movie)
@@ -171,13 +198,12 @@ public class ShowTimeService : IShowTimeService
         if (overlaps)
             throw new InvalidOperationException("This showtime overlaps with another showtime in the same cinema");
 
-        // 🔴 GET CINEMA
         var cinema = await _cinemaRepo.GetByIdAsync(vm.CinemaId, ct)
             ?? throw new KeyNotFoundException("Cinema not found");
 
-        // 🔴 UPDATE
         show.MovieId = vm.MovieId;
         show.CinemaId = vm.CinemaId;
+        show.HallId = vm.HallId;
         show.StartTime = vm.StartTime;
         show.AvailableSeats = cinema.TotalSeats;
 

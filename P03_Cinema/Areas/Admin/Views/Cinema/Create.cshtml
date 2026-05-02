@@ -9,24 +9,22 @@
 
             <form asp-action="Create" method="post" enctype="multipart/form-data">
 
+                @Html.AntiForgeryToken()
+
                 <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
                 <!-- Name -->
                 <div class="mb-3">
                     <label asp-for="Cinema.Name" class="form-label"></label>
                     <input asp-for="Cinema.Name" class="form-control" />
+                    <span asp-validation-for="Cinema.Name" class="text-danger"></span>
                 </div>
 
                 <!-- Location -->
                 <div class="mb-3">
                     <label asp-for="Cinema.Location" class="form-label"></label>
                     <input asp-for="Cinema.Location" class="form-control" />
-                </div>
-
-                <!-- Total Seats (NEW IMPORTANT FIELD) -->
-                <div class="mb-3">
-                    <label asp-for="Cinema.TotalSeats" class="form-label"></label>
-                    <input asp-for="Cinema.TotalSeats" class="form-control" />
+                    <span asp-validation-for="Cinema.Location" class="text-danger"></span>
                 </div>
 
                 <!-- Active -->
@@ -39,12 +37,12 @@
                 <div class="mb-3">
                     <label asp-for="Img" class="form-label">Cinema Image</label>
                     <input asp-for="Img" type="file" class="form-control" />
+                    <span asp-validation-for="Img" class="text-danger"></span>
                 </div>
 
                 <!-- Buttons -->
                 <div class="d-flex justify-content-between mt-4">
                     <a asp-action="Index" class="btn btn-outline-dark">← Back</a>
-
                     <button type="submit" class="btn btn-primary">Add Cinema</button>
                 </div>
 

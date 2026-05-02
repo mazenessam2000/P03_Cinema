@@ -13,7 +13,7 @@ public class DashboardVM
     public List<string> MovieNames { get; set; } = [];
     public List<int> MovieSales { get; set; } = [];
 
-    public List<DashboardShowTimeVM> Showtimes { get; set; } = [];
+    public List<ShowTimeDashboardVM> Showtimes { get; set; } = [];
 
     public List<ActivityVM> Activities { get; set; } = [];
     public List<string> Alerts { get; set; } = [];

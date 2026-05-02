@@ -9,6 +9,8 @@
 
             <form asp-action="Update" method="post" enctype="multipart/form-data">
 
+                @Html.AntiForgeryToken()
+
                 <input type="hidden" asp-for="Cinema.Id" />
 
                 <div asp-validation-summary="All" class="text-danger mb-3"></div>
@@ -17,38 +19,43 @@
                 <div class="mb-3">
                     <label asp-for="Cinema.Name" class="form-label"></label>
                     <input asp-for="Cinema.Name" class="form-control" />
+                    <span asp-validation-for="Cinema.Name" class="text-danger"></span>
                 </div>
 
                 <!-- Location -->
                 <div class="mb-3">
                     <label asp-for="Cinema.Location" class="form-label"></label>
                     <input asp-for="Cinema.Location" class="form-control" />
-                </div>
-
-                <!-- Total Seats -->
-                <div class="mb-3">
-                    <label asp-for="Cinema.TotalSeats" class="form-label"></label>
-                    <input asp-for="Cinema.TotalSeats" class="form-control" />
+                    <span asp-validation-for="Cinema.Location" class="text-danger"></span>
                 </div>
 
                 <!-- Active -->
                 <div class="form-check form-switch mb-3">
                     <input asp-for="Cinema.IsActive" class="form-check-input" />
+                    <label asp-for="Cinema.IsActive" class="form-check-label"></label>
                 </div>
 
                 <!-- Image -->
                 <div class="mb-3">
-                    <label asp-for="Img" class="form-label"></label>
+                    <label asp-for="Img" class="form-label">Cinema Image</label>
                     <input asp-for="Img" type="file" class="form-control" />
+                    <span asp-validation-for="Img" class="text-danger"></span>
 
                     @if (!string.IsNullOrEmpty(Model.Cinema.ImageUrl))
                     {
-                        <img src="~/Assets/Admin/img/cinema/@Model.Cinema.ImageUrl"
-                             style="height:100px; margin-top:10px;" />
+                        <div class="mt-2">
+                            <img src="~/Assets/Admin/img/cinema/@Model.Cinema.ImageUrl"
+                                 style="height:100px; object-fit:cover;" />
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="mt-2 text-muted small">No image uploaded</div>
                     }
                 </div>
 
-                <div class="d-flex justify-content-between">
+                <!-- Buttons -->
+                <div class="d-flex justify-content-between mt-4">
                     <a asp-action="Index" class="btn btn-outline-dark">← Back</a>
                     <button type="submit" class="btn btn-primary">Update</button>
                 </div>
@@ -58,6 +65,7 @@
         </div>
     </div>
 </div>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }

@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 
 namespace P03_Cinema.Areas.Customer.Controllers
 {
-    [Area(SD.Customer_AREA)]
+    [Area(SD.CUSTOMER_AREA)]
+    [Authorize(Roles = SD.CUSTOMER_ROLE)]
     public class ProfileController(UserManager<ApplicationUser> userManager) : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;

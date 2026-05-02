@@ -1,4 +1,28 @@
-﻿<!DOCTYPE html>
+﻿@using System.Security.Claims
+@inject ICartService cartService
+
+@{
+    string active(string controller, string action = null)
+    {
+        var c = ViewContext.RouteData.Values["controller"]?.ToString();
+        var a = ViewContext.RouteData.Values["action"]?.ToString();
+
+        if (action == null)
+            return c == controller ? "active" : "";
+
+        return c == controller && a == action ? "active" : "";
+    }
+
+    var userId = User.Identity.IsAuthenticated
+        ? User.FindFirstValue(ClaimTypes.NameIdentifier)
+        : null;
+
+    var cartCount = userId != null
+        ? await cartService.GetCartCountAsync(userId)
+        : 0;
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -7,6 +31,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
     <link rel="stylesheet" href="~/css/customer/base.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/customer/layout.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/customer/profilepage.css" asp-append-version="true" />
@@ -18,18 +43,18 @@
 
 <body>
 
-    <!-- ══════════════════════════════════════════════════════════ NAVBAR -->
+    <!-- ═════════════════ NAVBAR ═════════════════ -->
     <nav class="cv-navbar navbar navbar-expand-lg">
 
-        <!-- Brand -->
-        <a class="cv-brand" asp-controller="Home" asp-action="Index">
+        <!-- BRAND -->
+        <a class="cv-brand @active("Home", "Index")"
+               asp-controller="Home"
+               asp-action="Index">
             CINEMA<span style="color:#fff;opacity:.25">VERSE</span>
         </a>
 
-        <!-- Mobile toggler -->
-        <button class="navbar-toggler ms-auto me-2" type="button"
-                data-bs-toggle="collapse" data-bs-target="#cvNav"
-                aria-controls="cvNav" aria-expanded="false">
+        <!-- MOBILE -->
+        <button class="navbar-toggler ms-auto me-2" data-bs-toggle="collapse" data-bs-target="#cvNav">
             <span class="navbar-toggler-icon"></span>
         </button>
 
@@ -37,66 +62,77 @@
 
             <!-- LEFT NAV -->
             <ul class="cv-nav-links navbar-nav me-auto">
+
                 <li class="nav-item">
-                    <a class="nav-link" asp-controller="Movies" asp-action="Index">
+                    <a class="nav-link @active("Movies", "Index")"
+                           asp-controller="Movies"
+                           asp-action="Index">
                         <i class="fa fa-film me-1 opacity-50"></i> Movies
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" asp-controller="Series" asp-action="Index">
-                        <i class="fa fa-tv me-1 opacity-50"></i> Series
-                    </a>
-                </li>
 
-                <!-- Categories dropdown -->
-                <li class="nav-item dropdown cv-dropdown">
-                    <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown">
-                        <i class="fa fa-layer-group me-1 opacity-50"></i> Categories
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item"><i class="fa fa-bolt"></i> Action</a></li>
-                        <li><a class="dropdown-item"><i class="fa fa-face-laugh"></i> Comedy</a></li>
-                        <li><a class="dropdown-item"><i class="fa fa-ghost"></i> Horror</a></li>
-                        <li><a class="dropdown-item"><i class="fa fa-rocket"></i> Sci-Fi</a></li>
-                        <li><a class="dropdown-item"><i class="fa fa-masks-theater"></i> Drama</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item"><i class="fa fa-grid-2"></i> All Genres <span class="item-badge">18</span></a></li>
-                    </ul>
-                </li>
+                <!-- ✅ DYNAMIC CATEGORIES -->
+                @await Component.InvokeAsync("CategoriesDropdown")
+
             </ul>
 
-            <!-- RIGHT: search + user -->
+            <!-- RIGHT SIDE -->
             <div class="d-flex align-items-center gap-3 mt-2 mt-lg-0">
 
-                <!-- Search -->
+                <!-- SEARCH -->
                 <div class="cv-search d-none d-lg-block">
                     <i class="fa fa-magnifying-glass search-icon"></i>
-                    <input type="text" placeholder="Search titles..." />
+                    <input type="text" placeholder="Search movies..." />
                 </div>
 
-                @if (User is not null && User.Identity.IsAuthenticated)
+                <!-- CART -->
+                <a asp-area="Customer"
+                       asp-controller="Cart"
+                       asp-action="Index"
+                       class="position-relative text-white fs-5">
+
+                    <i class="fa fa-cart-shopping"></i>
+
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        @cartCount
+                    </span>
+                </a>
+
+                @if (User.Identity.IsAuthenticated)
                 {
-                    <!-- User pill dropdown -->
+                    <!-- USER -->
                     <div class="dropdown cv-dropdown">
-                        <div class="cv-user-pill dropdown-toggle" data-bs-toggle="dropdown" role="button">
+
+                        <div class="cv-user-pill dropdown-toggle" data-bs-toggle="dropdown">
                             <img src="https://i.pravatar.cc/150?u=@User.Identity.Name"
-                                 class="avatar-mini" alt="Avatar" />
+                                 class="avatar-mini" />
                             @User.Identity.Name
                         </div>
+
                         <ul class="dropdown-menu dropdown-menu-end">
+
                             <li>
                                 <a class="dropdown-item" asp-controller="Profile" asp-action="Index">
-                                    <i class="fa fa-id-card"></i> My Profile
+                                    <i class="fa fa-id-card"></i> Profile
                                 </a>
                             </li>
+
+                            <li>
+                                <a class="dropdown-item" asp-area="Customer" asp-controller="Cart" asp-action="Index">
+                                    <i class="fa fa-cart-shopping"></i> My Cart
+                                </a>
+                            </li>
+
                             <li><hr class="dropdown-divider"></li>
+
                             <li>
                                 <form asp-area="Identity" asp-controller="Account" asp-action="Logout" method="post">
-                                    <button class="dropdown-item" style="color:#e57070">
+                                    <button class="dropdown-item text-danger">
                                         <i class="fa fa-right-from-bracket"></i> Logout
                                     </button>
                                 </form>
                             </li>
+
                         </ul>
                     </div>
                 }
@@ -109,24 +145,24 @@
                         Register
                     </a>
                 }
+
             </div>
         </div>
     </nav>
 
-    <!-- ══════════════════════════════════════════════════════════ CONTENT -->
+    <!-- ═════════════════ CONTENT ═════════════════ -->
     <div class="container mt-4">
         @RenderBody()
     </div>
 
-    <!-- ══════════════════════════════════════════════════════════ FOOTER -->
+    <!-- ═════════════════ FOOTER ═════════════════ -->
     <footer class="cv-footer">
         <div class="footer-brand">CINEMAVERSE</div>
-        <p>© 2026 CinemaVerse. All rights reserved. &nbsp;·&nbsp; Made with 🎬</p>
+        <p>© 2026 CinemaVerse. All rights reserved.</p>
     </footer>
 
-    <!-- Bootstrap JS -->
+    <!-- Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- ★ CinemaVerse shared scripts -->
     <script src="~/js/Customer/cinemaverse.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)

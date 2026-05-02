@@ -50,8 +50,11 @@ namespace P03_Cinema.Areas.Identity.Controllers
                 return View(vm);
             }
 
+            await _userManager.AddToRoleAsync(user, SD.CUSTOMER_ROLE);
+
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             var link = Url.Action("Confirm", "Account", new { area = "Identity", token, userId = user.Id }, Request.Scheme);
+
             await _emailSender.SendEmailAsync(user.Email!, "Account confirmation",
                 $"<h1>Please confirm your email address by clicking <a href='{link}'>here</a></h1>");
 
@@ -341,6 +344,11 @@ namespace P03_Cinema.Areas.Identity.Controllers
             });
 
             return RedirectToAction(nameof(AuthMessage));
+        }
+
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
     }
 }

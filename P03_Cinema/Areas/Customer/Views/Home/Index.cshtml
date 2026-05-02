@@ -1,3 +1,5 @@
+@model HomeVM
+
 @{
     ViewData["Title"] = "Home";
 }
@@ -16,13 +18,15 @@
     <h4 class="mb-3">🎭 Categories</h4>
 
     <div class="d-flex flex-wrap gap-2">
-        <span class="badge bg-secondary p-2">Action</span>
-        <span class="badge bg-secondary p-2">Comedy</span>
-        <span class="badge bg-secondary p-2">Horror</span>
-        <span class="badge bg-secondary p-2">Sci-Fi</span>
-        <span class="badge bg-secondary p-2">Drama</span>
-        <span class="badge bg-secondary p-2">Romance</span>
-        <span class="badge bg-secondary p-2">Thriller</span>
+        @foreach (var cat in Model.Categories)
+        {
+            <a asp-controller="Movies"
+                   asp-action="ByCategory"
+                   asp-route-id="@cat.Id"
+                   class="badge bg-secondary p-2 text-decoration-none">
+                @cat.Name
+            </a>
+        }
     </div>
 </div>
 
@@ -31,73 +35,65 @@
     <h4 class="mb-3">🔥 Popular Movies</h4>
 
     <div class="row g-4">
+        @foreach (var movie in Model.PopularMovies)
+        {
+            <div class="col-md-3">
+                <a asp-controller="Movies"
+                       asp-action="Details"
+                       asp-route-id="@movie.Id"
+                       class="text-decoration-none text-dark">
 
-        <!-- Movie 1 -->
-        <div class="col-md-3">
-            <div class="card card-dark">
-                <img src="https://image.tmdb.org/t/p/w500/8UlWHLMpgZm9bx6QYh0NFoq67TZ.jpg" class="card-img-top">
-                <div class="card-body">
-                    <h6>Wonder Woman</h6>
-                    <small>Action • ⭐ 7.4</small>
-                </div>
+                    <div class="card card-dark h-100">
+
+                        <img src="@Url.Content($"~/assets/admin/img/movie/{movie.MainImage}")"
+                             class="card-img-top"
+                             style="height: 350px; object-fit: cover;" />
+
+                        <div class="card-body">
+                            <h6>@movie.Name</h6>
+
+                            <small>
+                                @string.Join(", ", movie.Categories)
+                            </small>
+                        </div>
+
+                    </div>
+                </a>
             </div>
-        </div>
-
-        <!-- Movie 2 -->
-        <div class="col-md-3">
-            <div class="card card-dark">
-                <img src="https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg" class="card-img-top">
-                <div class="card-body">
-                    <h6>The Dark Knight</h6>
-                    <small>Action • ⭐ 9.0</small>
-                </div>
-            </div>
-        </div>
-
-        <!-- Movie 3 -->
-        <div class="col-md-3">
-            <div class="card card-dark">
-                <img src="https://image.tmdb.org/t/p/w500/6DrHO1jr3qVrViUO6s6kFiAGM7.jpg" class="card-img-top">
-                <div class="card-body">
-                    <h6>Interstellar</h6>
-                    <small>Sci-Fi • ⭐ 8.6</small>
-                </div>
-            </div>
-        </div>
-
-        <!-- Movie 4 -->
-        <div class="col-md-3">
-            <div class="card card-dark">
-                <img src="https://image.tmdb.org/t/p/w500/udDclJoHjfjb8Ekgsd4FDteOkCU.jpg" class="card-img-top">
-                <div class="card-body">
-                    <h6>Joker</h6>
-                    <small>Drama • ⭐ 8.4</small>
-                </div>
-            </div>
-        </div>
-
+        }
     </div>
 </div>
 
-<!-- TRENDING -->
+<!-- TRENDING MOVIES -->
 <div class="mb-5">
-    <h4 class="mb-3">📈 Trending Now</h4>
+    <h4 class="mb-3">🚀 Trending Movies</h4>
 
-    <div class="row g-3">
+    <div class="row g-4">
+        @foreach (var movie in Model.TrendingMovies)
+        {
+            <div class="col-md-3">
+                <a asp-controller="Movies"
+                       asp-action="Details"
+                       asp-route-id="@movie.Id"
+                       class="text-decoration-none text-dark">
 
-        <div class="col-md-6">
-            <div class="card card-dark p-3">
-                <h5>Fast X</h5>
-                <p class="mb-0">High-speed action continues with explosive racing scenes.</p>
+                    <div class="card card-dark h-100">
+
+                        <img src="@Url.Content($"~/assets/admin/img/movie/{movie.MainImage}")"
+                             class="card-img-top"
+                             style="height: 350px; object-fit: cover;" />
+
+                        <div class="card-body">
+                            <h6>@movie.Name</h6>
+
+                            <small>
+                                @string.Join(", ", movie.Categories)
+                            </small>
+                        </div>
+
+                    </div>
+                </a>
             </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="card card-dark p-3">
-                <h5>Conjuring Universe</h5>
-                <p class="mb-0">Top horror franchise full of supernatural cases.</p>
-            </div>
-        </div>
-
+        }
     </div>
 </div>

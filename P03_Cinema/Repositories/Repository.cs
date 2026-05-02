@@ -45,6 +45,6 @@ public class Repository<T> : IRepository<T> where T : class
 
     public async Task<T?> GetByIdAsync(int id, CancellationToken ct = default)
     {
-        return await _dbSet.FindAsync(new object[] { id }, ct);
+        return await _dbSet.FindAsync([id], ct);
     }
 }

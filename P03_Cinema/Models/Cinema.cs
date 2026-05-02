@@ -22,10 +22,8 @@ public class Cinema
 
     [Display(Name = "Active")]
     public bool IsActive { get; set; }
+    public int TotalSeats => Halls?.Sum(h => h.TotalSeats) ?? 0;
 
-    [Range(1, 10000, ErrorMessage = "Total seats must be between 1 and 10000.")]
-    [Display(Name = "Total Seats")]
-    public int TotalSeats { get; set; }
-
+    public ICollection<Hall> Halls { get; set; } = [];
     public ICollection<ShowTime> ShowTimes { get; set; } = [];
 }

@@ -9,9 +9,6 @@ public class Booking
     public int ShowTimeId { get; set; }
     public ShowTime ShowTime { get; set; } = null!;
 
-    [Range(1, 10)]
-    public int SeatsCount { get; set; }
-
     [Range(0.01, 100000)]
     public decimal TotalPrice { get; set; }
 
@@ -20,5 +17,7 @@ public class Booking
     public string UserId { get; set; } = null!;
     public ApplicationUser User { get; set; } = null!;
 
-    //public ICollection<BookingSeat> BookingSeats { get; set; } = new List<BookingSeat>();
+    public ICollection<BookingSeat> BookingSeats { get; set; } = [];
+    public int SeatsCount => BookingSeats.Count;
+
 }

@@ -168,3 +168,11 @@
         box-shadow: 0 0 14px rgba(229,9,20,0.4);
         color: #fff !important;
     }
+
+.btn {
+    transition: all 0.2s ease;
+}
+
+    .btn:hover {
+        transform: translateY(-1px);
+    }
