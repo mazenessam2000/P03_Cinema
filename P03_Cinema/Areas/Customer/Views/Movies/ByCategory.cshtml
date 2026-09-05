@@ -1,0 +1,36 @@
+@model List<MovieCardVM>
+
+<h2 class="mb-4">🎭 Category Movies</h2>
+
+<div class="row g-4">
+
+    @foreach (var movie in Model)
+    {
+        <div class="col-md-3">
+
+            <a asp-action="Details"
+                   asp-route-id="@movie.Id"
+                   class="text-decoration-none text-dark">
+
+                <div class="card shadow-sm h-100">
+
+                    <img src="@Url.Content($"~/assets/admin/img/movie/{movie.MainImage}")"
+                         class="card-img-top"
+                         style="height: 350px; object-fit: cover;" />
+
+                    <div class="card-body">
+                        <h6>@movie.Name</h6>
+
+                        <small class="text-muted">
+                            @string.Join(", ", movie.Categories)
+                        </small>
+                    </div>
+
+                </div>
+
+            </a>
+
+        </div>
+    }
+
+</div>

@@ -11,28 +11,35 @@
 
             <form asp-action="Create" method="post" enctype="multipart/form-data">
 
+                <!-- Validation Summary -->
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
                 <!-- Name -->
                 <div class="mb-3">
                     <label asp-for="Category.Name" class="form-label"></label>
-                    <input asp-for="Category.Name" class="form-control" required />
+                    <input asp-for="Category.Name" class="form-control" />
+                    <span asp-validation-for="Category.Name" class="text-danger"></span>
                 </div>
 
                 <!-- Description -->
                 <div class="mb-3">
                     <label asp-for="Category.Description" class="form-label"></label>
                     <textarea asp-for="Category.Description" class="form-control"></textarea>
+                    <span asp-validation-for="Category.Description" class="text-danger"></span>
                 </div>
 
                 <!-- Active -->
                 <div class="mb-3 form-check form-switch">
                     <input asp-for="Category.IsActive" class="form-check-input" />
                     <label asp-for="Category.IsActive" class="form-check-label"></label>
+                    <span asp-validation-for="Category.IsActive" class="text-danger"></span>
                 </div>
 
                 <!-- Image -->
                 <div class="mb-3">
                     <label class="form-label">Category Image</label>
                     <input asp-for="Img" type="file" class="form-control" />
+                    <span asp-validation-for="Img" class="text-danger"></span>
                 </div>
 
                 <!-- Buttons -->
@@ -53,3 +60,7 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

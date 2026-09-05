@@ -8,9 +8,9 @@
 
     <div class="card shadow-sm">
         <div class="card-body">
+
             <form asp-action="Create" method="post" enctype="multipart/form-data">
 
-                <!-- 🔴 SHOW ERRORS -->
                 <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
                 <!-- Name -->
@@ -29,6 +29,12 @@
                 <div class="mb-3">
                     <label asp-for="Movie.Price" class="form-label"></label>
                     <input asp-for="Movie.Price" class="form-control" />
+                </div>
+
+                <!-- Duration -->
+                <div class="mb-3">
+                    <label asp-for="Movie.DurationMinutes" class="form-label"></label>
+                    <input asp-for="Movie.DurationMinutes" class="form-control" />
                 </div>
 
                 <!-- Release Date -->
@@ -78,20 +84,21 @@
                 <!-- Buttons -->
                 <div class="d-flex justify-content-between mt-4">
                     <a asp-action="Index" class="btn btn-outline-dark">← Back</a>
+
                     <div>
                         <button type="reset" class="btn btn-outline-secondary me-2">Reset</button>
                         <button type="submit" class="btn btn-primary">Create Movie</button>
                     </div>
                 </div>
+
             </form>
+
         </div>
     </div>
 </div>
 
 @section Scripts {
     <script>
-        $('.select2').select2({
-            width: '100%'
-        });
+        $('.select2').select2({ width: '100%' });
     </script>
 }

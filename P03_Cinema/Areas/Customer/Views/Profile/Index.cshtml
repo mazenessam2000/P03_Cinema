@@ -1,0 +1,81 @@
+@model UserProfileVM
+
+@{
+    ViewData["Title"] = "Profile";
+    var avatarUrl = "https://i.pravatar.cc/150?u=" + Model.Username;
+}
+
+<div class="cv-profile-wrap cv-animate">
+
+    <!-- Film strip -->
+    <div class="cv-film-strip">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span>
+    </div>
+
+    <div class="cv-surface" style="position:relative">
+
+        <!-- Banner -->
+        <div class="cv-profile-banner">
+            <!-- Avatar -->
+            <div class="cv-avatar-ring">
+                <img src="@avatarUrl" alt="Avatar" />
+            </div>
+            <!-- Member badge -->
+            <div class="cv-member-badge">@@@Model.Username</div>
+        </div>
+
+        <!-- Name / handle -->
+        <div class="cv-profile-meta">
+            <div class="cv-profile-name">@Model.FirstName @Model.LastName</div>
+        </div>
+
+        <!-- Quick stats -->
+        <div class="cv-profile-stats ms-4 my-2">
+            <div class="cv-stat">
+                <div class="cv-stat-value">47 Watched</div>
+            </div>
+            <div class="cv-stat">
+                <div class="cv-stat-value">12 Watchlist</div>
+            </div>
+            <div class="cv-stat">
+                <div class="cv-stat-value">8 Reviews</div>
+            </div>
+        </div>
+
+        <hr class="cv-divider" />
+
+        <!-- Info grid -->
+        <div class="cv-info-grid">
+            <div class="cv-info-cell">
+                <div class="cell-label">First Name</div>
+                <div class="cell-value">@Model.FirstName</div>
+            </div>
+            <div class="cv-info-cell">
+                <div class="cell-label">Last Name</div>
+                <div class="cell-value">@Model.LastName</div>
+            </div>
+            <div class="cv-info-cell">
+                <div class="cell-label">Username</div>
+                <div class="cell-value">@Model.Username</div>
+            </div>
+            <div class="cv-info-cell">
+                <div class="cell-label">Email</div>
+                <div class="cell-value">@Model.Email</div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="cv-profile-actions">
+            <a asp-action="VerifyPassword" class="cv-btn cv-btn-primary flex-grow-1">
+                <i class="fa fa-pen-to-square"></i> Edit Profile
+            </a>
+        </div>
+
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/customer/profilepage.css" />
+}

@@ -1,4 +1,4 @@
-﻿@model MovieCreateVM
+﻿@model MovieUpdateVM
 
 <div class="container-fluid py-4">
 
@@ -8,29 +8,37 @@
 
     <div class="card shadow-sm">
         <div class="card-body">
+
             <form asp-action="Update" method="post" enctype="multipart/form-data">
 
                 <input type="hidden" asp-for="Movie.Id" />
 
-                <!-- 🔴 SHOW ERRORS -->
                 <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
                 <!-- Name -->
                 <div class="mb-3">
                     <label asp-for="Movie.Name" class="form-label"></label>
                     <input asp-for="Movie.Name" class="form-control" />
+                    <span asp-validation-for="Movie.Name" class="text-danger"></span>
                 </div>
 
                 <!-- Description -->
                 <div class="mb-3">
                     <label asp-for="Movie.Description" class="form-label"></label>
                     <textarea asp-for="Movie.Description" class="form-control"></textarea>
+                    <span asp-validation-for="Movie.Description" class="text-danger"></span>
                 </div>
 
                 <!-- Price -->
                 <div class="mb-3">
                     <label asp-for="Movie.Price" class="form-label"></label>
                     <input asp-for="Movie.Price" class="form-control" />
+                </div>
+
+                <!-- Duration -->
+                <div class="mb-3">
+                    <label asp-for="Movie.DurationMinutes" class="form-label"></label>
+                    <input asp-for="Movie.DurationMinutes" class="form-control" />
                 </div>
 
                 <!-- Release Date -->
@@ -59,7 +67,7 @@
                     }
                 </div>
 
-                <!-- Gallery Upload -->
+                <!-- Gallery -->
                 <div class="mb-3">
                     <label class="form-label">Gallery</label>
                     <input asp-for="Gallery" type="file" multiple class="form-control" />
@@ -71,7 +79,7 @@
                     <div class="mt-2 d-flex flex-wrap gap-2">
                         @foreach (var img in Model.Movie.Images)
                         {
-                            <div style="position:relative;">
+                            <div id="img-@img.Id" style="position:relative;">
                                 <img src="~/Assets/Admin/img/movie/@img.ImageUrl"
                                      style="height:80px; width:80px; object-fit:cover; border-radius:6px;" />
 
@@ -109,12 +117,15 @@
                 <!-- Buttons -->
                 <div class="d-flex justify-content-between mt-4">
                     <a asp-action="Index" class="btn btn-outline-dark">← Back</a>
+
                     <div>
                         <button type="reset" class="btn btn-outline-secondary me-2">Reset</button>
                         <button type="submit" class="btn btn-primary">Update Movie</button>
                     </div>
                 </div>
+
             </form>
+
         </div>
     </div>
 </div>
@@ -126,15 +137,25 @@
         });
 
         function deleteImage(imageId) {
-            if (confirm('Are you sure you want to delete this image?')) {
-                fetch(`/Admin/Movie/DeleteImage/${imageId}`, {
-                    method: 'POST',
-                }).then(response => {
-                    if (response.ok) {
-                        location.reload();
-                    }
-                });
-            }
+            if (!confirm("Are you sure?")) return;
+
+            fetch(`/Admin/Movie/DeleteImage/${imageId}`, {
+                method: "POST"
+            })
+            .then(r => {
+                if (r.ok) {
+                    showToast("Image deleted", "success");
+
+                    const el = document.getElementById(`img-${imageId}`);
+                    if (el) el.remove();
+
+                } else {
+                    showToast("Error deleting image", "error");
+                }
+            })
+            .catch(() => {
+                showToast("Server error", "error");
+            });
         }
     </script>
 }

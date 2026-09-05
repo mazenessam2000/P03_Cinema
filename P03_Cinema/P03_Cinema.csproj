@@ -8,14 +8,24 @@
 
 
 	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.6" />
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="10.0.2" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.3" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.3" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.3" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.6" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.6" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.6">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="NuGet.Packaging" Version="7.3.1" />
+		<PackageReference Include="NuGet.Protocol" Version="7.3.1" />
+		<PackageReference Include="Stripe.net" Version="51.1.0" />
 	</ItemGroup>
 
 
 	<ItemGroup>
+	  <Folder Include="Areas\Admin\Views\Shared\" />
+	  <Folder Include="Areas\Customer\Views\Shared\" />
+	  <Folder Include="Areas\Identity\Views\Shared\" />
 	  <Folder Include="wwwroot\Assets\Admin\img\cinema\" />
 	  <Folder Include="wwwroot\Assets\Admin\img\actor\" />
 	</ItemGroup>

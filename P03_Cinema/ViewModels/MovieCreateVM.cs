@@ -10,6 +10,6 @@ public class MovieCreateVM
     public IEnumerable<Actor> AllActors { get; set; } = new List<Actor>();
     public IEnumerable<Category> AllCategories { get; set; } = new List<Category>();
 
-    public IFormFile? MainImg { get; set; }   // ✅ nullable
-    public List<IFormFile>? Gallery { get; set; } // ✅ nullable
+    public IFormFile? MainImg { get; set; }
+    public List<IFormFile>? Gallery { get; set; }
 }

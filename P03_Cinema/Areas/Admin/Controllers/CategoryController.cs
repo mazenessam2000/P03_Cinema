@@ -1,109 +1,77 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace P03_Cinema.Areas.Admin.Controllers
+namespace P03_Cinema.Areas.Admin.Controllers;
+
+[Area(SD.ADMIN_AREA)]
+[Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
+
+public class CategoryController(ICategoryService categoryService) : Controller
 {
-    [Area(SD.ADMIN_AREA)]
-    public class CategoryController : Controller
+    private readonly ICategoryService _categoryService = categoryService;
+    private const int PageSize = 12;
+
+    public async Task<IActionResult> Index(int page = 1, string q = "", CancellationToken ct = default)
     {
-        private readonly ApplicationDbContext _context;
+        var vm = await _categoryService.GetCategoriesPageAsync(page, PageSize, q, ct);
+        return View(vm);
+    }
 
-        public CategoryController(ApplicationDbContext context)
+    [HttpGet]
+    public IActionResult Create()
+    {
+        return View(new CategoryCreateVM());
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Create(CategoryCreateVM vm, CancellationToken ct)
+    {
+        if (!ModelState.IsValid)
+            return View(vm);
+
+        await _categoryService.AddAsync(vm, ct);
+        TempData["Success"] = "Category created successfully!";
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Update(int id, CancellationToken ct)
+    {
+        var category = await _categoryService.FindByIdAsync(id, ct);
+        if (category == null) return NotFound();
+
+        return View(new CategoryUpdateVM { Category = category });
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Update(CategoryUpdateVM vm, CancellationToken ct)
+    {
+        if (!ModelState.IsValid)
+            return View(vm);
+
+        try
         {
-            _context = context;
-        }
-
-        public IActionResult Index(int page = 1)
-        {
-            int pageSize = 9;
-
-            var total = _context.Categories.Count();
-
-            var categories = _context.Categories
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
-
-            ViewBag.CurrentPage = page;
-            ViewBag.TotalPages = (int)Math.Ceiling(total / (double)pageSize);
-
-            return View(categories);
-        }
-
-        [HttpGet]
-        public IActionResult Create()
-        {
-            return View(new CategoryCreateVM());
-        }
-
-        [HttpPost]
-        public IActionResult Create(CategoryCreateVM vm)
-        {
-            if (!ModelState.IsValid)
-                return View(vm);
-
-            if (vm.Img != null)
-                vm.Category.ImageUrl = CategoryService.SaveImage(vm.Img);
-
-            _context.Categories.Add(vm.Category);
-            _context.SaveChanges();
-
+            await _categoryService.UpdateAsync(vm, ct);
+            TempData["Success"] = "Category updated successfully!";
             return RedirectToAction(nameof(Index));
         }
-
-
-        // ✅ GET UPDATE
-        [HttpGet]
-        public IActionResult Update(int id)
+        catch (KeyNotFoundException)
         {
-            var category = _context.Categories.FirstOrDefault(x => x.Id == id);
-            if (category == null) return NotFound();
-
-            return View(new CategoryCreateVM
-            {
-                Category = category
-            });
+            return NotFound();
         }
+    }
 
-        [HttpPost]
-        public IActionResult Update(CategoryCreateVM vm)
+    [HttpPost]
+    public async Task<IActionResult> Delete(int id, CancellationToken ct)
+    {
+        try
         {
-            if (!ModelState.IsValid)
-                return View(vm);
-
-            var category = _context.Categories.FirstOrDefault(c => c.Id == vm.Category.Id);
-            if (category == null) return NotFound();
-
-            category.Name = vm.Category.Name;
-            category.Description = vm.Category.Description;
-            category.IsActive = vm.Category.IsActive;
-
-            if (vm.Img != null)
-            {
-                // delete old image
-                CategoryService.DeleteImage(category.ImageUrl);
-                // save new one
-                category.ImageUrl = CategoryService.SaveImage(vm.Img);
-            }
-
-            _context.SaveChanges();
-
-            return RedirectToAction(nameof(Index));
-        }
-
-
-        [HttpPost]
-        public IActionResult Delete(int id)
-        {
-            var category = _context.Categories.FirstOrDefault(x => x.Id == id);
-            if (category == null) return NotFound();
-
-            // delete image from wwwroot
-            CategoryService.DeleteImage(category.ImageUrl);
-
-            _context.Categories.Remove(category);
-            _context.SaveChanges();
-
+            await _categoryService.DeleteAsync(id, ct);
             return Ok();
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
         }
     }
 }

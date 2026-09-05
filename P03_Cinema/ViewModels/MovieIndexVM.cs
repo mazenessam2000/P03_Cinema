@@ -6,7 +6,9 @@ public class MovieIndexVM
 
     public Dictionary<int, List<string>> MovieActors { get; set; } = new();
     public Dictionary<int, List<string>> MovieCategories { get; set; } = new();
+    public Dictionary<int, List<string>> MovieImages { get; set; } = new();
 
+    public string SearchQuery { get; set; } = string.Empty;
     public int CurrentPage { get; set; }
     public int TotalPages { get; set; }
 }

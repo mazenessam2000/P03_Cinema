@@ -1,0 +1,37 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   CINEMAVERSE — FINAL POLISHED UI
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+    --red: #e50914;
+    --bg: #0a0a0a;
+    --nav: #141414;
+    --surface: #1a1a1a;
+    --surface-2: #202020;
+    --border: rgba(255,255,255,0.08);
+    --text: #f0f0f0;
+    --text-muted: #aaa;
+    --radius: 12px;
+    --yellow: #f2b365;
+}
+
+/* ── BASE ─────────────────────────────────────────────────────────────── */
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', sans-serif;
+    /* FIX: push footer to bottom on short pages */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+    /* FIX: main content grows to fill available space */
+    body > .container {
+        flex: 1;
+    }
+
+img {
+    max-width: 100%;
+    display: block;
+}

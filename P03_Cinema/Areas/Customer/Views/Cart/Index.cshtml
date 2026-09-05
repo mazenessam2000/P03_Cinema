@@ -1,0 +1,124 @@
+@model CartVM
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0">🛒 Your Cart</h4>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary btn-sm">← Browse Showtimes</a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (!Model.Items.Any())
+    {
+        <div class="text-center py-5">
+            <div class="fs-1 mb-3">🎟</div>
+            <h5 class="text-muted">Your cart is empty</h5>
+            <p class="text-muted">Browse showtimes and select your seats to get started.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+
+            <!-- Items -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-0">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Movie</th>
+                                    <th>Cinema / Hall</th>
+                                    <th>Seat</th>
+                                    <th>Showtime</th>
+                                    <th class="text-end">Price</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Items)
+                                {
+                                    <tr>
+                                        <td class="fw-semibold">@item.MovieName</td>
+                                        <td>
+                                            <div>@item.CinemaName</div>
+                                            <small class="text-muted">@item.HallName</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-primary">@item.SeatLabel</span>
+                                            @if (item.SeatType == SeatType.VIP)
+                                            {
+                                                <span class="badge bg-warning text-dark ms-1">VIP</span>
+                                            }
+                                        </td>
+                                        <td>@item.ShowTime.ToString("ddd dd MMM, h:mm tt")</td>
+                                        <td class="text-end fw-semibold">$@item.Price</td>
+                                        <td class="text-end">
+                                            <form asp-action="RemoveSeat" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="cartItemId" value="@item.CartItemId" />
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-outline-danger"
+                                                        onclick="return confirm('Remove this seat?')">✕</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Clear cart -->
+                <form asp-action="Clear" method="post" class="mt-2 text-end">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-sm btn-outline-secondary"
+                            onclick="return confirm('Clear entire cart?')">Clear Cart</button>
+                </form>
+            </div>
+
+            <!-- Summary -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Order Summary</h5>
+
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Seats</span>
+                            <span>@Model.ItemCount</span>
+                        </div>
+                        <hr />
+                        <div class="d-flex justify-content-between fw-bold fs-5">
+                            <span>Total</span>
+                            <span class="text-primary">$@Model.Total</span>
+                        </div>
+
+                        <div class="alert alert-warning small mt-3 mb-0">
+                            ⏱ Seats are reserved for <strong>10 minutes</strong>. Complete checkout before they expire.
+                        </div>
+
+                        <a asp-action="Checkout" class="btn btn-success w-100 mt-3 fw-semibold">
+                            Proceed to Checkout →
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    }
+
+</div>

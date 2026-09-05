@@ -1,4 +1,4 @@
-﻿@model ActorCreateVM
+﻿@model ActorUpdateVM
 
 <div class="container-fluid py-4">
 
@@ -13,22 +13,28 @@
 
                 <input type="hidden" asp-for="Actor.Id" />
 
+                <!-- Validation Summary -->
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
                 <!-- Full Name -->
                 <div class="mb-3">
                     <label asp-for="Actor.FullName" class="form-label"></label>
                     <input asp-for="Actor.FullName" class="form-control" />
+                    <span asp-validation-for="Actor.FullName" class="text-danger"></span>
                 </div>
 
                 <!-- Birth Date -->
                 <div class="mb-3">
                     <label asp-for="Actor.BirthDate" class="form-label"></label>
                     <input asp-for="Actor.BirthDate" type="date" class="form-control" />
+                    <span asp-validation-for="Actor.BirthDate" class="text-danger"></span>
                 </div>
 
                 <!-- Bio -->
                 <div class="mb-3">
                     <label asp-for="Actor.Bio" class="form-label"></label>
                     <textarea asp-for="Actor.Bio" class="form-control"></textarea>
+                    <span asp-validation-for="Actor.Bio" class="text-danger"></span>
                 </div>
 
                 <!-- Image -->
@@ -41,11 +47,14 @@
                         <div class="mt-2">
                             <img src="~/Assets/Admin/img/actor/@Model.Actor.ImageUrl"
                                  style="height:100px; object-fit:cover; border-radius:6px;" />
+
                             <div class="form-text">
                                 Current image — upload new to replace
                             </div>
                         </div>
                     }
+
+                    <span asp-validation-for="Img" class="text-danger"></span>
                 </div>
 
                 <!-- Buttons -->
@@ -66,3 +75,7 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
